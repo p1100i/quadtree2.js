@@ -1,0 +1,30 @@
+{
+  "name"        : "quadtree2",
+  "description" : "Two dimensional quadtree for regions and collision detection.",
+  "author"      : "Burning Gramma <burninggramma@gmail.com>",
+  "version"     : "0.0.1",
+  "main"        : "quadtree2.js",
+  "repository"  : {
+    "type" : "git",
+    "url"  : "https://github.com/burninggramma/quadtree2.js"
+  },
+  "engines"     : {
+    "node": ">= 0.6.0"
+  },
+  "scripts"     : {
+    "test"    : "mocha test/test.js",
+    "minify"  : "cat quadtree2.js | uglifyjs > quadtree2.min.js"
+  },
+  "dependencies" : {
+    "vec2" : "1.3.x"
+  },
+  "devDependencies": {
+    "mocha": "~1.17.0"
+  },
+  "keywords": [
+    "quadtree",
+    "2d",
+    "collision",
+    "detection"
+  ]
+}
