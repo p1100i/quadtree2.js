@@ -1,5 +1,5 @@
 # Quadtree 2d
-will be a two dimensional quadtree implementation for NodeJS projects.
+(will be) a JavaScript implementation of two dimensional quadtree for collision detection.
 
 [![Code Climate][codeclimate]](https://codeclimate.com/github/burninggramma/quadtree2.js)
 
