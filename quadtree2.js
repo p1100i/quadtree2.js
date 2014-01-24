@@ -1,5 +1,23 @@
 /*jshint loopfunc: true */
-var Vec2 = require('vec2'),
+
+// Helper function for using both in NodeJS and browser.
+var injector = function injector(cbBrowser, cbNodeJS){
+      if (typeof module !== 'undefined' && typeof module.exports == 'object') {
+        return cbNodeJS();
+      } else {
+        return cbBrowser();
+      }
+    },
+
+    // Requiring the Vec2 class
+    Vec2 =  injector(function() {
+              if (!window.Vec2) throw new Error('Vec2 is a requirement');
+            },
+            function(){
+              return require('vec2');
+            }),
+
+    // Forward decleration of Quadtree2
     Quadtree2;
 
 Quadtree2 = function Quadtree2(size, limit) {
@@ -14,7 +32,6 @@ Quadtree2 = function Quadtree2(size, limit) {
           necessary : ['size', 'limit']
         }
       },
-
 
       // Functions will be exported without init check.
       initFns = {
@@ -38,7 +55,7 @@ Quadtree2 = function Quadtree2(size, limit) {
         setSize : function setSize(size){
           if (size === undefined) return;
 
-          if (!(size instanceof Vec2))
+          if('object' !== typeof size || !(size instanceof Vec2))
             throw new Error('Parameter should be an instance of Vec2');
 
           data.size_ = size.clone();
@@ -76,4 +93,9 @@ Quadtree2 = function Quadtree2(size, limit) {
   }
 };
 
-module.exports = Quadtree2;
+injector(function () {
+  window.Quadtree2 = Quadtree2;
+},
+function() {
+  module.exports = Quadtree2;
+});
