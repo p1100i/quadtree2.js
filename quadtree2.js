@@ -1,5 +1,3 @@
-/*jshint loopfunc: true */
-
 // Helper function for using both in NodeJS and browser.
 var injector = function injector(cbBrowser, cbNodeJS){
       if (typeof module !== 'undefined' && typeof module.exports == 'object') {
@@ -24,7 +22,7 @@ Quadtree2 = function Quadtree2(size, limit) {
   var id,
 
       // Container for private data.
-      data = {},
+      data = { map_ : {}, count_ : 0 },
 
       // Property definitions
       constraints = {
@@ -33,8 +31,24 @@ Quadtree2 = function Quadtree2(size, limit) {
         }
       },
 
-      // Functions will be exported without init check.
-      initFns = {
+      // Private function definitions
+      fns = {
+        init : function init() {
+          var i;
+
+          for(i in constraints.data.necessary) {
+            if (data[constraints.data.necessary[i] + '_'] === undefined)
+              throw new Error('Can not work without the necessary properties');
+          }
+        },
+
+        checkInit : function checkInit() {
+          if (!data.inited_) fns.init();
+        }
+      },
+
+      // Public function definitions
+      publicFns = {
         getLimit : function getLimit(){
           return data.limit_;
         },
@@ -46,6 +60,10 @@ Quadtree2 = function Quadtree2(size, limit) {
             throw new Error('Parameter should be a number');
 
           data.limit_ = limit;
+        },
+
+        getCount : function getCount() {
+          return data.count_;
         },
 
         getSize : function getSize(){
@@ -61,36 +79,25 @@ Quadtree2 = function Quadtree2(size, limit) {
           data.size_ = size.clone();
         },
 
-        init : function init() {
-          var i;
+        addRect : function addRect(id, origin, size, rotation) {
+          fns.checkInit();
+          data.count_++;
+        },
 
-          for(i in constraints.data.necessary) {
-            if (data[constraints.data.necessary[i] + '_'] === undefined)
-              throw new Error('Can not work without the necessary properties');
-          }
-        }
-      },
-
-      // Functions will be exported together with init check.
-      runFns = {
-        addObject : function addObject(id){
-          // TODO implement me!
+        addCircle : function addCircle(id, origin, radius) {
+          this.checkInit();
+          throw new Error('Not implemented');
         }
       };
 
-  initFns.setSize(size);
-  initFns.setLimit(limit);
 
-  for (id in initFns) {
-    this[id] = initFns[id];
+  // Generate initialization functions.
+  for (id in publicFns) {
+    this[id] = publicFns[id];
   }
 
-  for (id in runFns) {
-    this[id] = function() {
-      if (!data.inited_) this.init();
-      runFns[id].apply(this, arguments);
-    };
-  }
+  this.setSize(size);
+  this.setLimit(limit);
 };
 
 injector(function () {

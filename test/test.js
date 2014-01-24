@@ -39,7 +39,7 @@ describe('Quadtree2', function(){
   });
 
   describe('#getSize', function(){
-    it('returns just a clone of the size', function() {
+    it('should return just a clone of the size', function() {
       var qt    = factory(),
           size  = qt.getSize();
 
@@ -47,6 +47,16 @@ describe('Quadtree2', function(){
 
       qt.getSize().x.should.not.eql(5);
       qt.getSize().x.should.eql(2);
+    });
+  });
+
+  describe('#addRect', function(){
+    it('should increase the object count', function() {
+      var qt = factory();
+
+      qt.getCount().should.eql(0);
+      qt.addRect();
+      qt.getCount().should.eql(1);
     });
   });
 });
