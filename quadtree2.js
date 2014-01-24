@@ -8,6 +8,14 @@ Quadtree2 = function Quadtree2(size, limit) {
       // Container for private data.
       data = {},
 
+      // Property definitions
+      constraints = {
+        data : {
+          necessary : ['size', 'limit']
+        }
+      },
+
+
       // Functions will be exported without init check.
       initFns = {
         getLimit : function getLimit(){
@@ -37,7 +45,12 @@ Quadtree2 = function Quadtree2(size, limit) {
         },
 
         init : function init() {
-          // TODO should check every property is set.
+          var i;
+
+          for(i in constraints.data.necessary) {
+            if (data[constraints.data.necessary[i] + '_'] === undefined)
+              throw new Error('Can not work without the necessary properties');
+          }
         }
       },
 
