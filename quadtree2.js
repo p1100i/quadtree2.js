@@ -85,7 +85,7 @@ Quadtree2 = function Quadtree2(size, limit) {
         },
 
         addCircle : function addCircle(id, origin, radius) {
-          this.checkInit();
+          fns.checkInit();
           throw new Error('Not implemented');
         }
       };
