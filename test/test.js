@@ -4,23 +4,37 @@ var Quadtree2 = require('../quadtree2'),
     should    = require('should'),
     factory;
 
-factory = function factory(){
-  return new Quadtree2(new Vec2(2,3), 4);
+factory = function factory(size, limit){
+  if (arguments.length < 1) {
+    size = new Vec2(2,3);
+    if (arguments.length < 2) limit = 4;
+  }
+
+  return new Quadtree2(size, limit);
 };
 
 describe('Quadtree2', function(){
   describe('constructor', function(){
-    it('should throw with inproper arguments', function(){
-      (function() { Quadtree2(2,3); }).should.throw();
+    context('with inproper arguments', function() {
+      it('should throw', function(){
+        (function() { factory(1,2); }).should.throw();
+      });
+
+      it('should throw', function(){
+        (function() { factory(new Vec(2,3), null); }).should.throw();
+      });
     });
 
-    it('should not throw with proper arguments', function(){
-      (function() { Quadtree2(new Vec2(2,3), 4); }).should.not.throw();
+    context('with proper arguments', function() {
+      it('should not throw', function(){
+        (function() { factory(new Vec2(2,3), 4); }).should.not.throw();
+      });
     });
 
-    it('sets width and height if they are passed', function() {
-      var qt = factory();
-      qt.addObject(1);
+    context('without limit', function() {
+      it('should not throw', function() {
+        (function() { factory(new Vec2(2,3), undefined); }).should.not.throw();
+      });
     });
   });
 
