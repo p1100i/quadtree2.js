@@ -10,6 +10,7 @@ var injector = function injector(cbBrowser, cbNodeJS){
     // Requiring the Vec2 class
     Vec2 =  injector(function() {
               if (!window.Vec2) throw new Error('Vec2 is a requirement');
+              return window.Vec2;
             },
             function(){
               return require('vec2');
@@ -91,7 +92,7 @@ Quadtree2 = function Quadtree2(size, limit) {
       };
 
 
-  // Generate initialization functions.
+  // Generate public functions.
   for (id in publicFns) {
     this[id] = publicFns[id];
   }
