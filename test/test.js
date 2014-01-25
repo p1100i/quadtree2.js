@@ -1,4 +1,4 @@
-/*jshint maxlen: 120 */
+// jshint maxlen: 120
 
 var Quadtree2 = require('../quadtree2'),
     Vec2      = require('vec2'),
@@ -24,7 +24,7 @@ oFactory = function oFactory(id, pos, radius, rotation) {
 };
 
 qtFactory = function qtFactory(size, limit, idKey, objects){
-  if (!size)  { size = new Vec2(2,3); }
+  if (!size)  { size = new Vec2(100, 100); }
   if (!limit) { limit = 4; }
 
   var qt = new Quadtree2(size, limit);
@@ -71,7 +71,7 @@ describe('Quadtree2', function(){
 
   describe('#getSize', function(){
     it('should return just a clone of the size', function() {
-      var qt    = qtFactory(),
+      var qt    = qtFactory(new Vec2(2, 3)),
           size  = qt.getSize();
 
       size.x = 5;
@@ -92,6 +92,20 @@ describe('Quadtree2', function(){
         var qt = qtFactory();
         qt.addObject.bind(null, 1).should.throw(/^NaO_obj/);
       });
+
+      it('should throw ND_rot_', function() {
+        var qt = qtFactory(),
+            o  = { pos_ : new Vec2(1,2) };
+
+        qt.addObject.bind(null, o).should.throw(/^ND_rot_/);
+      });
+
+      it('should throw NaN_rad_', function() {
+        var qt = qtFactory(),
+            o  = { pos_ : new Vec2(1,2), rad_ : 'x' };
+
+        qt.addObject.bind(null, o).should.throw(/^NaN_rad_/);
+      });
     });
 
     context('with obj id based configuration', function() {
@@ -106,7 +120,7 @@ describe('Quadtree2', function(){
       });
 
       context('with used obj id', function() {
-        it('should throw OaA_x', function() {
+        it('should throw OhK_x', function() {
           var qt = qtFactory(),
               o1 = oFactory(),
               o2 = oFactory();
@@ -115,7 +129,7 @@ describe('Quadtree2', function(){
 
           qt.setObjectKey('id', 'id_');
           qt.addObject.bind(null, o1).should.not.throw();
-          qt.addObject.bind(null, o2).should.throw(/^OaA_x/);
+          qt.addObject.bind(null, o2).should.throw(/^OhK_id_x/);
         });
       });
     });
@@ -128,14 +142,53 @@ describe('Quadtree2', function(){
       qt.addObject(o);
       qt.getCount().should.eql(1);
     });
+
+    it('should assign auto id to the object', function() {
+      var qt = qtFactory(),
+          o1 = { pos_ : new Vec2(1,2), rad_ : 3 };
+          o2 = { pos_ : new Vec2(1,2), rad_ : 3 };
+
+      qt.addObjects([o1, o2]);
+
+      o1.id_.should.not.eql(undefined);
+      o2.id_.should.eql(2);
+    });
   });
 
   describe('#setObjectKey', function(){
     context('with inited Quadtree2', function() {
-      it('should throw QaI', function() {
+      it('should throw FarT', function() {
         var qt = qtFactoryWithObjects();
 
-        qt.setObjectKey.bind(null, 'p', 'newPos_').should.throw(/^QaI/);
+        qt.setObjectKey.bind(null, 'p', 'newPos_').should.throw(/^FarT_checkInit/);
+      });
+    });
+  });
+
+  describe('#getCollidedObjects', function(){
+    context('with non-colliding objects', function() {
+      it('should return an empty array', function() {
+        var qt = qtFactory(),
+            o1 = oFactory(null, new Vec2(20,20), 5),
+            o2 = oFactory(null, new Vec2(42,52), 5);
+
+        qt.addObjects([o1, o2]);
+
+        //qt.getCollidedObjects().should.eql([]);
+      });
+    });
+
+    context('with some colliding objects', function() {
+      it('should return the two objects', function() {
+        var qt = qtFactory(),
+            o1 = oFactory(null, new Vec2(20,20), 5),
+            o2 = oFactory(null, new Vec2(22,22), 5),
+            o3 = oFactory(null, new Vec2(32,42), 5);
+
+        qt.addObjects([o1, o2, o3]);
+
+        //qt.getCollidedObjects().should.containDeep([o1, o2]);
+        //qt.getCollidedObjects().should.not.containEql(o3);
       });
     });
   });

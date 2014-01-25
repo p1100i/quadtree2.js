@@ -1,3 +1,5 @@
+// jshint maxlen: 120
+
 // Helper function for using both in NodeJS and browser.
 var injector = function injector(cbBrowser, cbNodeJS){
       if (typeof module !== 'undefined' && typeof module.exports == 'object') {
@@ -16,23 +18,120 @@ var injector = function injector(cbBrowser, cbNodeJS){
               return require('vec2');
             }),
 
-    // Forward decleration of Quadtree2
-    Quadtree2;
+    // Forward decleration of Quadtree2* classes
 
-Quadtree2 = function Quadtree2(size, limit, idKey) {
+    fnName = function fnName(fn) {
+      var ret = fn.toString();
+      ret = ret.substr('function '.length);
+      ret = ret.substr(0, ret.indexOf('('));
+      return ret;
+    },
+
+    // A verbose exception generator helper.
+    thrower = function thrower(code, message, key) {
+      var error = code;
+
+      if(key)             { error += '_' + key; }
+      if(message)         { error += ' - '; }
+      if(message && key)  { error += key + ': '; }
+      if(message)         { error += message; }
+
+      throw new Error(error);
+    },
+
+    Quadtree2,
+    Quadtree2Node,
+    Quadtree2Helper;
+
+Quadtree2Helper = function Quadtree2Helper() {};
+
+Quadtree2Helper.prototype = {
+  isNumber : function isNumber(param, key) {
+    if ('number' !== typeof param) {
+      thrower('NaN', 'Not a Number', key);
+    }
+  },
+
+  isString : function isString(param, key) {
+    if (!(typeof param === 'string' || param instanceof String)) {
+      thrower('NaS', 'Not a String', key);
+    }
+  },
+
+  isVec2 : function isVec2(param, key) {
+    var throwIt = false;
+
+    throwIt = 'object' !== typeof param || !(param instanceof Vec2);
+    throwIt = throwIt || param.x === undefined || param.y === undefined;
+
+    if(throwIt) {
+      thrower('NaV', 'Not a Vec2', key);
+    }
+  },
+
+  isDefined : function isDefined(param, key) {
+    if (param === undefined) {
+      thrower('ND', 'Not defined', key);
+    }
+  },
+
+  isObject : function isObject(param, key) {
+    if ('object' !== typeof param) {
+      thrower('NaO', 'Not an Object', key);
+    }
+  },
+
+  hasKey : function hasKey(obj, k, key) {
+    if ( Object.keys(obj).indexOf(k) === -1 ) {
+      thrower('OhnK', 'Object has no key', key + k);
+    }
+  },
+
+  hasNoKey : function hasNoKey(obj, k, key) {
+    if ( Object.keys(obj).indexOf(k) !== -1 ) {
+      thrower('OhK', 'Object has key', key + k);
+    }
+  },
+
+  fnFalse : function fn(cb) {
+    if(cb()) {
+      thrower('FarT', 'function already returns true', fnName(cb));
+    }
+  },
+
+  byCallbackObject : function byCallbackObject(obj, cbObj, keyTable) {
+    var key;
+    for (key in cbObj) {
+      if (keyTable !== undefined) {
+        cbObj[key](obj[keyTable[key]], keyTable[key]);
+      } else {
+        cbObj[key](obj[key], key);
+      }
+    }
+  }
+};
+
+Quadtree2Node = function Quadtree2Node() {
+  this.children = [];
+};
+
+Quadtree2 = function Quadtree2(size, limit, idKey, exposePrivateFns) {
   var id,
 
       // Container for private data.
       data = {
-        map_    : {},
-        count_  : 0,
-        ids_    : 0,
-        autoId_ : true,
-        inited_ : false,
-        limit_  : undefined,
-        size_   : undefined,
-        shapes_ : {}
+        root_     : new Quadtree2Node(),
+        objects_  : {},
+        count_    : 0,
+        ids_      : 0,
+        autoId_   : true,
+        inited_   : false,
+        limit_    : undefined,
+        size_     : undefined,
+        shapes_   : {}
       },
+
+      helper    = new Quadtree2Helper(),
 
       // Inserted object keys.
       k = {
@@ -42,108 +141,32 @@ Quadtree2 = function Quadtree2(size, limit, idKey) {
         id : 'id_'
       },
 
-      // A verbose exception generator helper.
-      thrower = function thrower(code, message, key) {
-        var error = code;
-
-        if(key)             { error += '_' + key; }
-        if(message)         { error += ' - '; }
-        if(message && key)  { error += key + ': '; }
-        if(message)         { error += message; }
-
-        throw new Error(error);
-      },
 
       // Validation definitions
-      validate = {
-        isNumber : function isNumber(param, key) {
-          if ('number' !== typeof param) {
-            thrower('NaN', 'Not a Number', key);
-          }
-        },
-
-        isString : function isString(param, key) {
-          if (!(typeof param === 'string' || param instanceof String)) {
-            thrower('NaS', 'Not a String', key);
-          }
-        },
-
-        isVec2 : function isVec2(param, key) {
-          var throwIt = false;
-
-          throwIt = 'object' !== typeof param || !(param instanceof Vec2);
-          throwIt = throwIt || param.x === undefined || param.y === undefined;
-
-          if(throwIt) {
-            thrower('NaV', 'Not a Vec2', key);
-          }
-        },
-
-        isDefined : function isDefined(param, key) {
-          if (param === undefined) {
-            thrower('ND', 'Not defined', key);
-          }
-        },
-
-        isObject : function isObject(param, key) {
-          if ('object' !== typeof param) {
-            thrower('NaO', 'Not an Object', key);
-          }
-        },
-
-        isUniqId : function isUniqId(id, key) {
-          if (data.map_[id] !== undefined) {
-            thrower('OaA', 'Object already added', key);
-          }
-        },
-
-        isNotInited : function isNotInited(key) {
-          if (data.inited_) {
-            thrower('QaI', 'Quadtree2 already inited', key);
-          }
-        },
-
-        hasKey : function hasKey(obj, k, key) {
-          if ( Object.keys(obj).indexOf(k) === -1 ) {
-            thrower('OhnK', 'Object has no key: ' + k, key);
-          }
-        },
-
-        byCallbackObject : function byCallbackObject(obj, cbObj, keyTable) {
-          var key;
-          for (key in cbObj) {
-            if (keyTable !== undefined) {
-              cbObj[key](obj[keyTable[key]], keyTable[key]);
-            } else {
-              cbObj[key](obj[key], key);
-            }
-          }
-        }
-      },
 
       // Property definitions.
       constraints = {
         data : {
           necessary : {
-            size_  : validate.isVec2,
-            limit_ : validate.isNumber
+            size_  : helper.isVec2,
+            limit_ : helper.isNumber
           }
         },
 
         k : {
           necessary : {
-            p : validate.isVec2
+            p : helper.isVec2
           },
 
           c : {
             necessary : {
-              r : validate.isNumber
+              r : helper.isNumber
             },
           },
 
           r : {
             necessary : {
-              R : validate.isNumber
+              R : helper.isNumber
             },
           }
         }
@@ -155,8 +178,23 @@ Quadtree2 = function Quadtree2(size, limit, idKey) {
           return ++data.ids_;
         },
 
+        getSmallestNode : function getSmallestNode(obj, node) {
+          var id;
+
+          if (!node) { node = this.root_; }
+
+          if (node.children.length === 0) { return node; }
+
+          for (id in node.children) {
+            // if (node covers obj)
+            // return getSmallestNode(obj, node.children[id]);
+          }
+
+          return node;
+        },
+
         init : function init() {
-          validate.byCallbackObject(data, constraints.data.necessary);
+          helper.byCallbackObject(data, constraints.data.necessary);
 
           data.inited_ = true;
         },
@@ -167,12 +205,12 @@ Quadtree2 = function Quadtree2(size, limit, idKey) {
         },
 
         checkObjectKeys : function checkObjectKeys(obj) {
-          validate.isDefined(obj[k.id], k.id);
-          validate.isUniqId(obj[k.id], obj[k.id]);
+          helper.isDefined(obj[k.id], k.id);
+          helper.hasNoKey(data.objects_, obj[k.id], k.id);
 
-          validate.byCallbackObject(obj, constraints.k.necessary, k);
+          helper.byCallbackObject(obj, constraints.k.necessary, k);
 
-          validate.byCallbackObject(
+          helper.byCallbackObject(
             obj,
             constraints.k[fns.getObjShape(obj)].necessary,
             k
@@ -189,7 +227,7 @@ Quadtree2 = function Quadtree2(size, limit, idKey) {
           var rect = obj[k.r] === undefined,
               key  = rect ? k.R : k.r;
 
-          validate.isDefined(obj[key], key);
+          helper.isDefined(obj[key], key);
 
           data.shapes_[obj[k.id]] = rect ? 'r' : 'c';
         },
@@ -208,7 +246,7 @@ Quadtree2 = function Quadtree2(size, limit, idKey) {
         setLimit : function setLimit(limit) {
           if (limit === undefined) { return; }
 
-          validate.isNumber(limit, 'limit_');
+          helper.isNumber(limit, 'limit_');
 
           data.limit_ = limit;
         },
@@ -218,11 +256,11 @@ Quadtree2 = function Quadtree2(size, limit, idKey) {
         },
 
         setObjectKey : function setObjectKey(key, val) {
-          validate.isNotInited();
+          helper.fnFalse(fns.checkInit);
           if (val === undefined) { return; }
 
-          validate.hasKey(k, key, key);
-          validate.isString(val, key);
+          helper.hasKey(k, key, key);
+          helper.isString(val, key);
 
           if (key === 'id') data.autoId_ = false;
           k[key] = val;
@@ -235,22 +273,50 @@ Quadtree2 = function Quadtree2(size, limit, idKey) {
         setSize : function setSize(size) {
           if (size === undefined) { return; }
 
-          validate.isVec2(size, 'size_');
+          helper.isVec2(size, 'size_');
 
           data.size_ = size.clone();
         },
 
+        addObjects : function addObject(objs) {
+          objs.forEach(function(obj) {
+            publicFns.addObject(obj);
+          });
+        },
+
         addObject : function addObject(obj) {
-          validate.isDefined(obj, 'obj');
-          validate.isObject(obj, 'obj');
+          helper.isDefined(obj, 'obj');
+          helper.isObject(obj, 'obj');
 
           fns.checkInit(true);
           fns.setObjId(obj);
           fns.setObjShape(obj);
           fns.checkObjectKeys(obj);
 
-          data.map_[obj[k.id]] = obj;
+          //  1. find the smallest quadrant Q where the obj O can still fit
+          //  2. if Q has more objects then limit
+          //    2.1 if any object would fit into a subquadrant of Q then break it
+          //      2.1.1 recalculate all objects in Q for the subquadrants
+          //        2.1.1.1 if all of them comes into the same subquadrant then repeat
+          //        2.1.1.2 for those who dont fit, they stay on Q
+          //    2.2 if non of them fits there is no point breaking up
+          //  3. insert O into Q objects
+            
+          data.objects_[obj[k.id]] = obj;
           data.count_++;
+        },
+
+        getCollidedObjects : function getCollidedObjects() {
+          var result = [],
+              id;
+
+          fns.checkInit(true);
+
+          for (id in data.objects_) {
+            result.push(data.objects_[id]);
+          }
+
+          return result;
         }
       };
 
@@ -258,6 +324,13 @@ Quadtree2 = function Quadtree2(size, limit, idKey) {
   // Generate public functions.
   for (id in publicFns) {
     this[id] = publicFns[id];
+  }
+
+  // For testing purpose allow exposing private functions.
+  if (exposePrivateFns) {
+    for (id in fns) {
+      this[id] = fns[id];
+    }
   }
 
   this.setSize(size);
