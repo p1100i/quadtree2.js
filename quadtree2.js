@@ -72,12 +72,6 @@ Quadtree2Quadrant.prototype = {
     this.topMid_      = this.center_.clone();
     this.topMid_.y    = this.leftTop_.y;
 
-    // Not needed right now.
-    // this.rightMid_    = this.center_.clone();
-    // this.rightMid_.x += this.rightTop_.x;
-    // this.botMid_     = this.center_.clone();
-    // this.botMid_.y  += this.leftBot_.y;
-
     this.corners_ = [
       this.leftTop_,
       this.leftBot_,
@@ -87,7 +81,7 @@ Quadtree2Quadrant.prototype = {
   },
 
   makeChildren : function makeChildren() {
-    if (this.children_.length > 0) return false;
+    if (this.children_.length > 0) { return false; }
 
     this.children_.push(
       new Quadtree2Quadrant(this.leftTop_,  this.rad_),
@@ -177,9 +171,6 @@ Quadtree2 = function Quadtree2(size, limit, idKey, exposePrivateFns) {
         id : 'id_'
       },
 
-
-      // Validation definitions
-
       // Property definitions.
       constraints = {
         data : {
@@ -230,8 +221,6 @@ Quadtree2 = function Quadtree2(size, limit, idKey, exposePrivateFns) {
 
           intersectingChildQuadrants = quadrant.intersectingChildren(obj[k.p], obj[k.r]);
 
-          //if(data.debug_) { debugger; }
-
           // Also true if there were no children
           if (intersectingChildQuadrants.length === quadrant.getChildCount()) {
             if (checked || quadrant.intersects(obj[k.p], obj[k.r])) {
@@ -253,7 +242,6 @@ Quadtree2 = function Quadtree2(size, limit, idKey, exposePrivateFns) {
 
         // Supposes that the quadrant is the smallest one without children
         // or with children whom all intersect the obj.
-
         addObjToQuadrant : function addObjToQuadrant(quadrant, obj) {
           var i,
               j,
@@ -385,7 +373,7 @@ Quadtree2 = function Quadtree2(size, limit, idKey, exposePrivateFns) {
           validator.hasKey(k, key, key);
           validator.isString(val, key);
 
-          if (key === 'id') data.autoId_ = false;
+          if (key === 'id') { data.autoId_ = false; }
           k[key] = val;
         },
 
@@ -429,8 +417,7 @@ Quadtree2 = function Quadtree2(size, limit, idKey, exposePrivateFns) {
         },
 
         getCollidedObjects : function getCollidedObjects() {
-          var result = [],
-              id;
+          var result = [];
 
           fns.checkInit(true);
 
