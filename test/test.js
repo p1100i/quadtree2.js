@@ -1,3 +1,5 @@
+/*jshint maxlen: 120 */
+
 var Quadtree2 = require('../quadtree2'),
     Vec2      = require('vec2'),
     assert    = require('assert'),
@@ -6,14 +8,22 @@ var Quadtree2 = require('../quadtree2'),
     qtFactory,
     qtFactoryWithObjects;
 
-oFactory = function oFactory(id, pos) {
-  return {
-    id_   : id  || 1 ,
+oFactory = function oFactory(id, pos, radius, rotation) {
+  var r = {
+    id_   : id  || 1,
     pos_  : pos || new Vec2(2,3)
   };
+
+  if(radius) {
+    r.rad_ = radius;
+  } else {
+    r.rot_ = rotation || 1.2;
+  }
+
+  return r;
 };
 
-qtFactory = function qtFactory(size, limit, objects){
+qtFactory = function qtFactory(size, limit, idKey, objects){
   if (arguments.length < 1) {
     size = new Vec2(2,3);
     if (arguments.length < 2) limit = 4;
@@ -30,21 +40,21 @@ qtFactory = function qtFactory(size, limit, objects){
   return qt;
 };
 
-qtFactoryWithObjects = function qtFactoryWithObjects(size, limit, objects){
-  objects = objects || [oFactory(), oFactory()];
+qtFactoryWithObjects = function qtFactoryWithObjects(size, limit, idKey, objects) {
+  objects = objects || [oFactory(1), oFactory(2, undefined, 3)];
 
-  return qtFactory(size, limit, objects);
+  return qtFactory(size, limit, idKey, objects);
 };
 
 describe('Quadtree2', function(){
   describe('constructor', function(){
     context('with inproper arguments', function() {
-      it('should throw NaV', function(){
-        Quadtree2.bind(null, 1,2).should.throw(/^NaV/);
+      it('should throw NaV_size_', function(){
+        Quadtree2.bind(null, 1,2).should.throw(/^NaV_size_/);
       });
 
-      it('should throw NaN', function(){
-        Quadtree2.bind(null, new Vec2(2,3), null).should.throw(/^NaN/);
+      it('should throw NaN_limit_', function(){
+        Quadtree2.bind(null, new Vec2(2,3), null).should.throw(/^NaN_limit_/);
       });
     });
 
@@ -75,37 +85,39 @@ describe('Quadtree2', function(){
 
   describe('#addObject', function(){
     context('with inproper arguments', function() {
-      it('should throw ND', function() {
+      it('should throw ND_obj', function() {
         var qt = qtFactory();
-        qt.addObject.should.throw(/^ND/);
+        qt.addObject.should.throw(/^ND_obj/);
       });
 
-      it('should throw NaO', function() {
+      it('should throw NaO_obj', function() {
         var qt = qtFactory();
-        qt.addObject.bind(null, 1).should.throw(/^NaO/);
+        qt.addObject.bind(null, 1).should.throw(/^NaO_obj/);
       });
     });
 
     context('with obj id based configuration', function() {
       context('without obj id defined', function() {
-        it('should throw ND', function() {
+        it('should throw ND_id_', function() {
           var qt = qtFactory(),
-              o  = { pos_ : new Vec2(1,2) };
+              o  = { pos_ : new Vec2(1,2), rad_ : 3 };
 
           qt.setObjectKey('id', 'id_');
-          qt.addObject.bind(null, o).should.throw(/^ND/);
+          qt.addObject.bind(null, o).should.throw(/^ND_id_/);
         });
       });
 
       context('with used obj id', function() {
-        it('should throw OaA', function() {
+        it('should throw OaA_x', function() {
           var qt = qtFactory(),
-              o1 = { pos_ : new Vec2(1,2), id_ : 'x' },
-              o2 = { pos_ : new Vec2(2,3), id_ : 'x' };
+              o1 = oFactory(),
+              o2 = oFactory();
+
+          o2.id_ = o1.id_ = 'x';
 
           qt.setObjectKey('id', 'id_');
           qt.addObject.bind(null, o1).should.not.throw();
-          qt.addObject.bind(null, o2).should.throw(/^OaA/);
+          qt.addObject.bind(null, o2).should.throw(/^OaA_x/);
         });
       });
     });

@@ -31,7 +31,7 @@ Quadtree2 = function Quadtree2(size, limit, idKey) {
         inited_ : false,
         limit_  : undefined,
         size_   : undefined,
-        meta_   : { shapes : {} }
+        shapes_ : {}
       },
 
       // Inserted object keys.
@@ -42,58 +42,70 @@ Quadtree2 = function Quadtree2(size, limit, idKey) {
         id : 'id_'
       },
 
+      // A verbose exception generator helper.
+      thrower = function thrower(code, message, key) {
+        var error = code;
+
+        if(key)             { error += '_' + key; }
+        if(message)         { error += ' - '; }
+        if(message && key)  { error += key + ': '; }
+        if(message)         { error += message; }
+
+        throw new Error(error);
+      },
+
       // Validation definitions
       validate = {
-        isNumber : function isNumber(param) {
+        isNumber : function isNumber(param, key) {
           if ('number' !== typeof param) {
-            throw new Error('NaN - Not a Number');
+            thrower('NaN', 'Not a Number', key);
           }
         },
 
-        isString : function isString(param) {
+        isString : function isString(param, key) {
           if (!(typeof param === 'string' || param instanceof String)) {
-            throw new Error('NaS - Not a String');
+            thrower('NaS', 'Not a String', key);
           }
         },
 
-        isVec2 : function isVec2(param) {
+        isVec2 : function isVec2(param, key) {
           var throwIt = false;
 
           throwIt = 'object' !== typeof param || !(param instanceof Vec2);
           throwIt = throwIt || param.x === undefined || param.y === undefined;
 
           if(throwIt) {
-            throw new Error('NaV - Not a Vec2');
+            thrower('NaV', 'Not a Vec2', key);
           }
         },
 
-        isDefined : function isDefined(param) {
+        isDefined : function isDefined(param, key) {
           if (param === undefined) {
-            throw new Error('ND - Not defined');
+            thrower('ND', 'Not defined', key);
           }
         },
 
-        isObject : function isObject(param) {
+        isObject : function isObject(param, key) {
           if ('object' !== typeof param) {
-            throw new Error('NaO - Not an Object');
+            thrower('NaO', 'Not an Object', key);
           }
         },
 
-        isUniqId : function isUniqId(id) {
+        isUniqId : function isUniqId(id, key) {
           if (data.map_[id] !== undefined) {
-            throw new Error('OaA - Object already added');
+            thrower('OaA', 'Object already added', key);
           }
         },
 
-        isNotInited : function isNotInited() {
+        isNotInited : function isNotInited(key) {
           if (data.inited_) {
-            throw new Error('QaI - Quadtree2 already inited');
+            thrower('QaI', 'Quadtree2 already inited', key);
           }
         },
 
-        hasKey : function hasKey(obj, key) {
-          if ( Object.keys(obj).indexOf(key) === -1 ) {
-            throw new Error('OhnK - Object has no key: ' + key);
+        hasKey : function hasKey(obj, k, key) {
+          if ( Object.keys(obj).indexOf(k) === -1 ) {
+            thrower('OhnK', 'Object has no key: ' + k, key);
           }
         },
 
@@ -101,9 +113,9 @@ Quadtree2 = function Quadtree2(size, limit, idKey) {
           var key;
           for (key in cbObj) {
             if (keyTable !== undefined) {
-              cbObj[key](obj[keyTable[key]]);
+              cbObj[key](obj[keyTable[key]], keyTable[key]);
             } else {
-              cbObj[key](obj[key]);
+              cbObj[key](obj[key], key);
             }
           }
         }
@@ -123,13 +135,13 @@ Quadtree2 = function Quadtree2(size, limit, idKey) {
             p : validate.isVec2
           },
 
-          circle : {
+          c : {
             necessary : {
               r : validate.isNumber
             },
           },
 
-          rect : {
+          r : {
             necessary : {
               R : validate.isNumber
             },
@@ -155,20 +167,35 @@ Quadtree2 = function Quadtree2(size, limit, idKey) {
         },
 
         checkObjectKeys : function checkObjectKeys(obj) {
-          validate.isDefined(obj);
-          validate.isObject(obj);
+          validate.isDefined(obj[k.id], k.id);
+          validate.isUniqId(obj[k.id], obj[k.id]);
+
           validate.byCallbackObject(obj, constraints.k.necessary, k);
 
-          if (!data.autoId_) {
-            validate.isDefined(obj[k.id]);
-            validate.isUniqId(obj[k.id]);
-          }
+          validate.byCallbackObject(
+            obj,
+            constraints.k[fns.getObjShape(obj)].necessary,
+            k
+          );
         },
 
         setObjId : function setObjId(obj) {
-          if(data.autoId_) {
+          if (data.autoId_) {
             obj[k.id] = fns.nextId();
           }
+        },
+
+        setObjShape : function setObjShape(obj) {
+          var rect = obj[k.r] === undefined,
+              key  = rect ? k.R : k.r;
+
+          validate.isDefined(obj[key], key);
+
+          data.shapes_[obj[k.id]] = rect ? 'r' : 'c';
+        },
+
+        getObjShape : function getObjShape(obj) {
+          return data.shapes_[obj[k.id]];
         }
       },
 
@@ -181,7 +208,7 @@ Quadtree2 = function Quadtree2(size, limit, idKey) {
         setLimit : function setLimit(limit) {
           if (limit === undefined) { return; }
 
-          validate.isNumber(limit);
+          validate.isNumber(limit, 'limit_');
 
           data.limit_ = limit;
         },
@@ -194,8 +221,8 @@ Quadtree2 = function Quadtree2(size, limit, idKey) {
           validate.isNotInited();
           if (val === undefined) { return; }
 
-          validate.hasKey(k, key);
-          validate.isString(val);
+          validate.hasKey(k, key, key);
+          validate.isString(val, key);
 
           if (key === 'id') data.autoId_ = false;
           k[key] = val;
@@ -208,17 +235,19 @@ Quadtree2 = function Quadtree2(size, limit, idKey) {
         setSize : function setSize(size) {
           if (size === undefined) { return; }
 
-          validate.isVec2(size);
+          validate.isVec2(size, 'size_');
 
           data.size_ = size.clone();
         },
 
         addObject : function addObject(obj) {
-          fns.checkInit(true);
-          fns.checkObjectKeys(obj);
-          fns.setObjId(obj);
+          validate.isDefined(obj, 'obj');
+          validate.isObject(obj, 'obj');
 
-          validate.isUniqId(obj[k.id]);
+          fns.checkInit(true);
+          fns.setObjId(obj);
+          fns.setObjShape(obj);
+          fns.checkObjectKeys(obj);
 
           data.map_[obj[k.id]] = obj;
           data.count_++;
