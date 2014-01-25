@@ -24,10 +24,8 @@ oFactory = function oFactory(id, pos, radius, rotation) {
 };
 
 qtFactory = function qtFactory(size, limit, idKey, objects){
-  if (arguments.length < 1) {
-    size = new Vec2(2,3);
-    if (arguments.length < 2) limit = 4;
-  }
+  if (!size)  { size = new Vec2(2,3); }
+  if (!limit) { limit = 4; }
 
   var qt = new Quadtree2(size, limit);
 
@@ -135,10 +133,8 @@ describe('Quadtree2', function(){
   describe('#setObjectKey', function(){
     context('with inited Quadtree2', function() {
       it('should throw QaI', function() {
-        var qt = qtFactory(),
-            o  = oFactory();
+        var qt = qtFactoryWithObjects();
 
-        qt.addObject(o);
         qt.setObjectKey.bind(null, 'p', 'newPos_').should.throw(/^QaI/);
       });
     });
