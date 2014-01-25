@@ -14,34 +14,46 @@ oFactory = function oFactory(id, pos, radius, rotation) {
     pos_  : pos || new Vec2(2,3)
   };
 
-  if(radius) {
-    r.rad_ = radius;
+  if(rotation) {
+    r.rot_ = rotation;
   } else {
-    r.rot_ = rotation || 1.2;
+    r.rad_ = radius || 2;
   }
 
   return r;
 };
 
-qtFactory = function qtFactory(size, limit, idKey, objects){
+qtFactory = function qtFactory(size, limit, idKey){
   if (!size)  { size = new Vec2(100, 100); }
   if (!limit) { limit = 4; }
 
-  var qt = new Quadtree2(size, limit);
-
-  if (objects && objects.length > 0) {
-    objects.forEach(function(o){
-      qt.addObject(o);
-    });
-  }
-
-  return qt;
+  return new Quadtree2(size, limit, idKey, true);
 };
 
-qtFactoryWithObjects = function qtFactoryWithObjects(size, limit, idKey, objects) {
-  objects = objects || [oFactory(1), oFactory(2, undefined, 3)];
+qtFactoryWithObjects = function qtFactoryWithObjects(count, size, limit, idKey) {
+  var i,
+      objects = [],
+      qt      = qtFactory(size, limit, idKey),
+      obj;
 
-  return qtFactory(size, limit, idKey, objects);
+  if (!count) count = 100;
+
+  size = qt.getSize();
+
+  for (i = 0; i < count; i++) {
+    obj = oFactory();
+
+    obj.pos_ = new Vec2(
+      ~~(Math.random() * size.x),
+      ~~(Math.random() * size.y)
+    );
+
+    objects.push(obj);
+  }
+
+  qt.addObjects(objects);
+
+  return qt;
 };
 
 describe('Quadtree2', function(){
@@ -174,7 +186,7 @@ describe('Quadtree2', function(){
 
         qt.addObjects([o1, o2]);
 
-        //qt.getCollidedObjects().should.eql([]);
+        qt.getCollidedObjects().should.eql([]);
       });
     });
 
@@ -187,8 +199,36 @@ describe('Quadtree2', function(){
 
         qt.addObjects([o1, o2, o3]);
 
-        //qt.getCollidedObjects().should.containDeep([o1, o2]);
-        //qt.getCollidedObjects().should.not.containEql(o3);
+        qt.getCollidedObjects().should.containEql([o1, o2]);
+        qt.getCollidedObjects().should.not.containEql([o2, o1]);
+      });
+    });
+  });
+
+  describe('#getQuadrantCount', function(){
+    context('with two objects and one limit', function() {
+      it('should return five quadrants', function() {
+        var qt = qtFactory(new Vec2(10, 10), 1),
+            o1 = oFactory(null, new Vec2(2,2), 1),
+            o2 = oFactory(null, new Vec2(7,7), 1),
+            o3 = oFactory(null, new Vec2(7,2), 1),
+            qs;
+
+        qt.addObjects([o1, o2]);
+
+        qs = qt.getSmallestQuadrants(o3);
+        qs.length.should.eql(1);
+        qs[0].leftTop_.should.eql(new Vec2(5,0));
+        qs[0].size_.should.eql(new Vec2(5,5));
+      });
+    });
+
+    context('with some objects', function() {
+      it('should return more quadrants', function() {
+        var qt = qtFactoryWithObjects(100);
+
+        qt.getQuadrantCount().should.above(5);
+        //qt.getQuadrantCount().should.below(30);
       });
     });
   });
