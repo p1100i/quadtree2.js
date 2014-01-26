@@ -44,9 +44,10 @@ var injector = function injector(cbBrowser, cbNodeJS){
     Quadtree2Validator;
 
 Quadtree2Quadrant = function Quadtree2Quadrant(leftTop, size) {
-  this.leftTop_   = leftTop.clone();
-  this.children_  = [];
-  this.objects_   = [];
+  this.leftTop_     = leftTop.clone();
+  this.children_    = [];
+  this.objects_     = {};
+  this.objectCount_ = 0;
 
   this.setSize(size);
 };
@@ -83,18 +84,27 @@ Quadtree2Quadrant.prototype = {
     return true;
   },
 
-  cleanObjects : function cleanObjects() {
-    this.objects_ = this.objects_.filter(function(o){ return o === undefined; });
-  },
-
-  addObject : function addObject(obj) {
-    this.objects_.push(obj);
+  addObject : function addObject(id, obj) {
+    this.objectCount_++;
+    this.objects_[id] = obj;
   },
 
   removeObjects : function removeObjects() {
     var result = this.objects_;
-    this.objects_ = [];
+    this.objects_ = {};
+    this.objectCount_ = 0;
     return result;
+  },
+
+  removeObject : function removeObject(id) {
+    var result = this.objects_[id];
+    this.objectCount_--;
+    delete(this.objects_[id]);
+    return result;
+  },
+
+  getObjectCount : function getObjectCount() {
+    return this.objectCount_;
   },
 
   intersectingChildren : function intersectingChildren(pos, rad) {
@@ -133,18 +143,6 @@ Quadtree2Quadrant.prototype = {
     return count;
   },
 
-  getObjectCount : function getObjectCount(recursive) {
-    var count = this.objects_.length;
-
-    if (recursive) {
-      this.children_.forEach(function(child) {
-        count += child.getObjectCount(recursive);
-      });
-    }
-
-    return count;
-  },
-
   getChildren : function getChildren(recursive, result) {
     if (!result) result = [];
 
@@ -157,6 +155,24 @@ Quadtree2Quadrant.prototype = {
     }
 
     return result;
+  },
+
+  getObjects : function getObjects(recursive, result) {
+    var id;
+
+    if (!result) result = {};
+
+    for (id in this.objects_) {
+      result[id] = this.objects_[id];
+    }
+
+    if (recursive) {
+      this.children_.forEach(function(child) {
+        child.getObjects(recursive, result);
+      });
+    }
+
+    return result;
   }
 };
 
@@ -165,14 +181,15 @@ Quadtree2 = function Quadtree2(size, limit, idKey) {
 
       // Container for private data.
       data = {
-        root_     : new Quadtree2Quadrant(new Vec2(0,0)),
-        objects_  : {},
-        ids_      : 0,
-        autoId_   : true,
-        inited_   : false,
-        limit_    : undefined,
-        size_     : undefined,
-        shapes_   : {}
+        root_      : new Quadtree2Quadrant(new Vec2(0,0)),
+        objects_   : {},
+        ids_       : 0,
+        autoId_    : true,
+        inited_    : false,
+        limit_     : undefined,
+        size_      : undefined,
+        shapes_    : {},
+        quadrants_ : {}
       },
 
       validator = new Quadtree2Validator(),
@@ -254,11 +271,21 @@ Quadtree2 = function Quadtree2(size, limit, idKey) {
           return smallestQuadrants;
         },
 
+        updateObjQuadrants : function updateObjQuadrants(obj) {
+        },
+
+        addObjectToQuadrant : function addObjectToQuadrant(obj, quadrant) {
+          var id = obj[k.id];
+          if(data.quadrants_[id] === undefined) data.quadrants_[id] = [];
+          data.quadrants_[id].push(quadrant);
+          quadrant.addObject(id, obj);
+        },
+
         // Supposes that the quadrant is the smallest one without children
         // or with children whom all intersect the obj.
-        addObjToQuadrant : function addObjToQuadrant(obj, quadrant) {
-          var addByQuadrant,
-              addByObj,
+        addObjectToSubtree : function addObjectToSubtree(obj, quadrant) {
+          var id,
+              addBySubtree,
               smallestQs,
               objs;
 
@@ -271,17 +298,17 @@ Quadtree2 = function Quadtree2(size, limit, idKey) {
             if (smallestQs.length === 1 && smallestQs[0] === quadrant) {
               // If its myself because all my children would intersect with
               // it, then no point storing the obj in children => addObject.
-              quadrant.addObject(obj);
+              fns.addObjectToQuadrant(obj, quadrant);
 
             } else {
               // Propagate further to children
-              addByQuadrant = function(q) { fns.addObjToQuadrant(obj, q); };
-              smallestQs.forEach(addByQuadrant);
+              addBySubtree = function(q) { fns.addObjectToSubtree(obj, q); };
+              smallestQs.forEach(addBySubtree);
             }
 
           } else if (quadrant.getObjectCount() < data.limit_) {
             // Has no children but still got place, so store it.
-            quadrant.addObject(obj);
+            fns.addObjectToQuadrant(obj, quadrant);
 
           } else {
             // Got no place so lets make children.
@@ -289,42 +316,34 @@ Quadtree2 = function Quadtree2(size, limit, idKey) {
 
             // Remove all the stored objects.
             objs = quadrant.removeObjects();
-            objs.push(obj);
+            objs[obj[k.id]] = obj;
 
             // Recalculate all objects which were stored before.
-            addByObj = function(o) { fns.addObjToQuadrant(o, quadrant); };
-            objs.forEach(addByObj);
+            for (id in objs) { fns.addObjectToSubtree(objs[id], quadrant); }
           }
 
         },
 
-        getCollisionsInQuadrant : function getCollisionsInQuadrant(quadrant, objects) {
-          var i,
-              j,
-              clonedObjects,
-              collidedObjects = [];
+        getObjectCollisionsInQuadrant : function getObjectCollisionsInQuadrant(quadrant) {
+            var idA,
+                idB,
+                objects = quadrant.getObjects(true),
+                collidedObjectPairs = [],
+                checkedIds = [];
 
-          if (!quadrant)  { quadrant = data.root_; }
-          if (!objects)   { objects = []; }
+            for (idA in objects) {
+              checkedIds.push(idA);
 
-          objects.push.apply(objects, quadrant.objects_);
+              for (idB in objects) {
+                if (checkedIds.indexOf(idB) !== -1) { continue; }
 
-          if (quadrant.children_.length === 0) {
-            for (i = 0; i < objects.length; i++) {
-              for (j = i + 1; j < objects.length; j++) {
-                if (fns.hasCollision(objects[i], objects[j])) {
-                  collidedObjects.push([objects[i], objects[j]]);
+                if (fns.hasCollision(objects[idA], objects[idB])) {
+                  collidedObjectPairs.push([objects[idA], objects[idB]]);
                 }
               }
             }
-          }
 
-          for (i in quadrant.children_) {
-            clonedObjects = objects.slice(0);
-            collidedObjects.concat(fns.getCollisionInQuadrant(quadrant.children_[i], clonedObjects));
-          }
-
-          return collidedObjects;
+            return collidedObjectPairs;
         },
 
         init : function init() {
@@ -441,7 +460,7 @@ Quadtree2 = function Quadtree2(size, limit, idKey) {
           fns.setObjShape(obj);
           fns.checkObjectKeys(obj);
 
-          fns.addObjToQuadrant(obj);
+          fns.addObjectToSubtree(obj);
 
           data.objects_[obj[k.id]] = obj;
         },
@@ -451,7 +470,7 @@ Quadtree2 = function Quadtree2(size, limit, idKey) {
 
           fns.checkInit(true);
 
-          return fns.getCollisionsInQuadrant();
+          return fns.getObjectCollisionsInQuadrant(data.root_);
         },
 
         getCount : function getCount() {
