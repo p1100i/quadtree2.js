@@ -60,24 +60,14 @@ Quadtree2Quadrant.prototype = {
 
     this.leftBot_     = this.leftTop_.clone();
     this.leftBot_.y  += size.y;
-
     this.rightTop_    = this.leftTop_.clone();
     this.rightTop_.x += size.x;
-
     this.rightBot_    = this.leftTop_.add(size, true);
 
-    // Midle defs
     this.leftMid_     = this.center_.clone();
     this.leftMid_.x   = this.leftTop_.x;
     this.topMid_      = this.center_.clone();
     this.topMid_.y    = this.leftTop_.y;
-
-    this.corners_ = [
-      this.leftTop_,
-      this.leftBot_,
-      this.rightTop_,
-      this.rightBot_
-    ];
   },
 
   makeChildren : function makeChildren() {
@@ -168,7 +158,7 @@ Quadtree2Quadrant.prototype = {
   }
 };
 
-Quadtree2 = function Quadtree2(size, limit, idKey, exposePrivateFns) {
+Quadtree2 = function Quadtree2(size, limit, idKey, exposeForDebugging) {
   var id,
 
       // Container for private data.
@@ -450,8 +440,8 @@ Quadtree2 = function Quadtree2(size, limit, idKey, exposePrivateFns) {
         }
       },
 
-      // Public function definitions
-      publicDebugFns = {
+      // Debug functions
+      debugFns = {
         debug : function debug(val) {
           if(val !== undefined) data.debug_ = val;
           return data.debug_;
@@ -474,21 +464,13 @@ Quadtree2 = function Quadtree2(size, limit, idKey, exposePrivateFns) {
         }
       };
 
-
   // Generate public functions.
-  for (id in publicFns) {
-    this[id] = publicFns[id];
-  }
-
-  for (id in publicDebugFns) {
-    this[id] = publicDebugFns[id];
-  }
+  for (id in publicFns) { this[id] = publicFns[id]; }
 
   // For testing purpose allow exposing private functions.
-  if (exposePrivateFns) {
-    for (id in fns) {
-      this[id] = fns[id];
-    }
+  if (exposeForDebugging) {
+    for (id in debugFns)  { this[id] = debugFns[id]; }
+    for (id in fns)       { this[id] = fns[id]; }
   }
 
   this.setSize(size);

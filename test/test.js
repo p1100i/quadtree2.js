@@ -217,21 +217,17 @@ describe('Quadtree2', function(){
             o6 = oFactory(null, new Vec2(50,50), 40),
             o7 = oFactory(null, new Vec2(72,3), 1),
             o8 = oFactory(null, new Vec2(75,25), 20),
-            qs;
+            checkSingleQss = function(qss, leftTop, size) {
+              qss.length.should.eql(1);
+              qss[0].leftTop_.should.eql(leftTop);
+              qss[0].size_.should.eql(size);
+            };
 
         qt.addObjects([o1, o2]);
-        qs = qt.getQuadrants();
         qt.getQuadrantCount().should.eql(5);
 
-        qss = qt.getSmallestQuadrants(o3);
-        qss.length.should.eql(1);
-        qss[0].leftTop_.should.eql(new Vec2(50,0));
-        qss[0].size_.should.eql(new Vec2(50,50));
-
-        qss = qt.getSmallestQuadrants(o5);
-        qss.length.should.eql(1);
-        qss[0].leftTop_.should.eql(new Vec2(0,0));
-        qss[0].size_.should.eql(new Vec2(100,100));
+        checkSingleQss(qt.getSmallestQuadrants(o3), new Vec2(50, 0), new Vec2(50,50));
+        checkSingleQss(qt.getSmallestQuadrants(o5), new Vec2(0, 0), new Vec2(100,100));
 
         qt.addObjects([o3, o4, o5]);
 
@@ -243,21 +239,14 @@ describe('Quadtree2', function(){
         qt.addObject(o7);
         qt.getQuadrantCount().should.eql(17);
 
-        qt.addObject(o8);
-        qss = qt.getSmallestQuadrants(o8);
-        qss.length.should.eql(1);
-        qss[0].leftTop_.should.eql(new Vec2(50,0));
-        qss[0].size_.should.eql(new Vec2(50,50));
+        checkSingleQss(qt.getSmallestQuadrants(o8), new Vec2(50, 0), new Vec2(50,50));
 
+        qt.addObject(o8);
         qt.getQuadrantCount().should.eql(17);
       });
     });
 
     context('with some objects', function() {
-      it('should return the right count', function() {
-        qtFactoryWithObjects(1, null, 1).getQuadrantCount().should.eql(1);
-      });
-
       it('should return the right count', function() {
         qtFactoryWithObjects(1, null, 4).getQuadrantCount().should.eql(1);
       });
@@ -266,18 +255,10 @@ describe('Quadtree2', function(){
         qtFactoryWithObjects(4, null, 4).getQuadrantCount().should.eql(1);
       });
 
-      it('should return the right count', function() {
-        qtFactoryWithObjects(5, null, 4).getQuadrantCount().should.eql(5);
-      });
-
-      it('should return the right count', function() {
-        qtFactoryWithObjects(10, null, 4).getQuadrantCount().should.below(10);
-      });
-
       it('should return more quadrants', function() {
-        var qt = qtFactoryWithObjects(100, null, 20);
-        qt.getQuadrantCount().should.above(9);
-        qt.getQuadrantCount().should.below(25);
+        var qt = qtFactoryWithObjects(1000, null, 20);
+        qt.getQuadrantCount().should.above(250);
+        qt.getQuadrantCount().should.below(350);
       });
     });
   });
