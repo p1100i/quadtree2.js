@@ -206,8 +206,8 @@ describe('Quadtree2', function(){
   });
 
   describe('#getQuadrantCount', function(){
-    context('with two objects and one limit', function() {
-      it('should return five quadrants', function() {
+    context('with some objects', function() {
+      it('should behave correct', function() {
         var qt = qtFactory(new Vec2(100, 100), 1),
             o1 = oFactory(null, new Vec2(2,2), 1),
             o2 = oFactory(null, new Vec2(98,98), 1),
@@ -223,6 +223,7 @@ describe('Quadtree2', function(){
               qss[0].size_.should.eql(size);
             };
 
+        qt.debug(true);
         qt.addObjects([o1, o2]);
         qt.getQuadrantCount().should.eql(5);
 
@@ -244,9 +245,21 @@ describe('Quadtree2', function(){
         qt.addObject(o8);
         qt.getQuadrantCount().should.eql(17);
       });
-    });
 
-    context('with some objects', function() {
+      it('should behave correct', function() {
+        var qt = qtFactory(new Vec2(100, 100), 4),
+            o1 = oFactory(null, new Vec2(2,2), 1),
+            o2 = oFactory(null, new Vec2(4,4), 1),
+            o3 = oFactory(null, new Vec2(4,2), 1),
+            o4 = oFactory(null, new Vec2(2,4), 1),
+            o5 = oFactory(null, new Vec2(6,2), 1);
+
+        qt.debug(true);
+        qt.addObjects([o1, o2, o3, o4, o5]);
+        qt.getQuadrantCount().should.eql(21);
+        qt.getLeafQuadrants().length.should.eql(16);
+      });
+
       it('should return the right count', function() {
         qtFactoryWithObjects(1, null, 4).getQuadrantCount().should.eql(1);
       });

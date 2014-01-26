@@ -146,6 +146,8 @@ Quadtree2Quadrant.prototype = {
   },
 
   getChildren : function getChildren(recursive, result) {
+    if (!result) result = [];
+
     result.push.apply(result, this.children_);
 
     if (recursive) {
@@ -158,7 +160,7 @@ Quadtree2Quadrant.prototype = {
   }
 };
 
-Quadtree2 = function Quadtree2(size, limit, idKey, exposeForDebugging) {
+Quadtree2 = function Quadtree2(size, limit, idKey) {
   var id,
 
       // Container for private data.
@@ -371,6 +373,19 @@ Quadtree2 = function Quadtree2(size, limit, idKey, exposeForDebugging) {
         }
       },
 
+      // Debug functions
+      debugFns = {
+        getQuadrants: function getQuadrants() {
+          return data.root_.getChildren(true, [data.root_]);
+        },
+
+        getLeafQuadrants : function getLeafQuadrants() {
+          return debugFns.getQuadrants().filter(function(q){
+            return !q.hasChildren();
+          });
+        }
+      },
+
       // Public function definitions
       publicFns = {
         getLimit : function getLimit() {
@@ -437,22 +452,10 @@ Quadtree2 = function Quadtree2(size, limit, idKey, exposeForDebugging) {
           fns.checkInit(true);
 
           return fns.getCollisionsInQuadrant();
-        }
-      },
-
-      // Debug functions
-      debugFns = {
-        debug : function debug(val) {
-          if(val !== undefined) data.debug_ = val;
-          return data.debug_;
         },
 
         getCount : function getCount() {
           return Object.keys(data.objects_).length;
-        },
-
-        getQuadrants: function getQuadrants() {
-          return data.root_.getChildren(true, [data.root_]);
         },
 
         getQuadrantCount : function getQuadrantCount() {
@@ -461,17 +464,26 @@ Quadtree2 = function Quadtree2(size, limit, idKey, exposeForDebugging) {
 
         getQuadrantObjectCount : function getQuadrantObjectCount() {
           return data.root_.getObjectCount(true);
+        },
+
+        debug : function debug(val) {
+          var id;
+
+          if(val !== undefined){
+            data.debug_ = val;
+
+            // For testing purpose allow exposing private functions.
+            fns.checkInit(true);
+            for (id in debugFns)  { this[id] = debugFns[id]; }
+            for (id in fns)       { this[id] = fns[id]; }
+          }
+
+          return data.debug_;
         }
       };
 
   // Generate public functions.
   for (id in publicFns) { this[id] = publicFns[id]; }
-
-  // For testing purpose allow exposing private functions.
-  if (exposeForDebugging) {
-    for (id in debugFns)  { this[id] = debugFns[id]; }
-    for (id in fns)       { this[id] = fns[id]; }
-  }
 
   this.setSize(size);
   this.setLimit(limit);
