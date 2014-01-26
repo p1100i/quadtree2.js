@@ -1,12 +1,18 @@
 module.exports = function(grunt) {
-  var banner =  '/*\n';
-
-  banner += ' * - <%= pkg.name %> <%= pkg.version %>\n';
-  banner += ' * - <%= pkg.description %>\n';
-  banner += ' * - by <%= pkg.author %>\n';
-  banner += ' * - <%= pkg.repository.url %>\n';
-  banner += ' * --------------------------------------------\n';
-  banner += ' * built on <%= grunt.template.today("yyyy-mm-dd") %>\n*/\n';
+  var banner = [
+    '/**',
+    ' * @license',
+    ' * <%= pkg.name %> - v<%= pkg.version %>',
+    ' * Copyright (c) 2013-2014 burninggramma',
+    ' * <%= pkg.repository.url %>',
+    ' *',
+    ' * Compiled: <%= grunt.template.today("yyyy-mm-dd") %>',
+    ' *',
+    ' * <%= pkg.name %> is licensed under the <%= pkg.license %> License.',
+    ' * <%= pkg.licenseUrl %>',
+    ' */',
+    ''
+  ].join('\n');
 
   grunt.initConfig({
     pkg : grunt.file.readJSON('package.json'),
@@ -21,20 +27,34 @@ module.exports = function(grunt) {
     },
 
     browserify: {
-      'quadtree2.js': ['browserify.js']
+      '<%= pkg.name %>.js': ['browserify.js']
     },
 
     uglify: {
-      options: {
-        banner: banner,
+      browserified : {
+        options: {
+          banner: banner,
+          beautify: {
+            width: 100,
+            beautify: true
+          }
+        },
+        files: {
+          '<%= pkg.name %>.js':
+          ['<%= pkg.name %>.js'],
+        }
       },
       build: {
+        options: {
+          banner: banner
+        },
         files: {
           '<%= pkg.name %>.min.js':
           ['<%= pkg.name %>.js'],
         }
-      }
+      },
     },
+
     simplemocha : {
       all: { src : ['test/*.js'] },
       options : {
@@ -43,6 +63,7 @@ module.exports = function(grunt) {
         timeout: 300
       }
     },
+
     watch : {
       scripts : {
         files : ['test/*.js', 'src/*.js'],
@@ -62,6 +83,7 @@ module.exports = function(grunt) {
     'jshint',
     'simplemocha',
     'browserify',
-    'uglify'
+    'uglify:browserified',
+    'uglify:build'
   ]);
 };

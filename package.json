@@ -4,6 +4,8 @@
   "author"      : "Burning Gramma <burninggramma@gmail.com>",
   "version"     : "0.0.1",
   "main"        : "src/quadtree2.js",
+  "license"     : "MIT",
+  "licenseUrl"  : "http://www.opensource.org/licenses/mit-license.php",
   "repository"  : {
     "type" : "git",
     "url"  : "https://github.com/burninggramma/quadtree2.js"
