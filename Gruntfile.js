@@ -10,21 +10,27 @@ module.exports = function(grunt) {
 
   grunt.initConfig({
     pkg : grunt.file.readJSON('package.json'),
+
     jshint: {
       options: {
         maxlen: 80,
         quotmark: 'single'
       },
       dev: ['Gruntfile.js', 'test/*.js'],
-      app:  ['quadtree2.js']
+      app:  ['src/quadtree2.js']
     },
+
+    browserify: {
+      'quadtree2.js': ['browserify.js']
+    },
+
     uglify: {
       options: {
         banner: banner,
       },
       build: {
-        files: { 
-          '<%= pkg.name %>.min.js': 
+        files: {
+          '<%= pkg.name %>.min.js':
           ['<%= pkg.name %>.js'],
         }
       }
@@ -39,17 +45,23 @@ module.exports = function(grunt) {
     },
     watch : {
       scripts : {
-        files : ['test/*.js', '*.js'],
+        files : ['test/*.js', 'src/*.js'],
         tasks : ['test']
       }
     }
   });
 
+  grunt.loadNpmTasks('grunt-browserify');
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-simple-mocha');
 
   grunt.registerTask('test',    ['jshint', 'simplemocha']);
-  grunt.registerTask('default', ['jshint', 'simplemocha', 'uglify']);
+  grunt.registerTask('default', [
+    'jshint',
+    'simplemocha',
+    'browserify',
+    'uglify'
+  ]);
 };

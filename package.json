@@ -3,7 +3,7 @@
   "description" : "Two dimensional quadtree for regions and collision detection.",
   "author"      : "Burning Gramma <burninggramma@gmail.com>",
   "version"     : "0.0.1",
-  "main"        : "quadtree2.js",
+  "main"        : "src/quadtree2.js",
   "repository"  : {
     "type" : "git",
     "url"  : "https://github.com/burninggramma/quadtree2.js"
@@ -24,6 +24,7 @@
     "should"              : "latest",
     "grunt"               : "latest",
     "grunt-cli"           : "latest",
+    "grunt-browserify"    : "latest",
     "grunt-contrib-jshint": "latest",
     "grunt-contrib-watch" : "latest",
     "grunt-contrib-uglify": "latest",

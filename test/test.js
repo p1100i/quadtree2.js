@@ -1,6 +1,6 @@
 // jshint maxlen: 120
 
-var Quadtree2 = require('../quadtree2'),
+var Quadtree2 = require('../src/quadtree2'),
     Vec2      = require('vec2'),
     assert    = require('assert'),
     should    = require('should'),
@@ -218,9 +218,11 @@ describe('Quadtree2', function(){
             o7 = oFactory(null, new Vec2(72,3), 1),
             o8 = oFactory(null, new Vec2(75,25), 20),
             checkSingleQss = function(qss, leftTop, size) {
-              qss.length.should.eql(1);
-              qss[0].leftTop_.should.eql(leftTop);
-              qss[0].size_.should.eql(size);
+              Object.keys(qss).length.should.eql(1);
+              for (var id in qss) {
+                qss[id].leftTop_.should.eql(leftTop);
+                qss[id].size_.should.eql(size);
+              }
             };
 
         qt.debug(true);
@@ -270,8 +272,8 @@ describe('Quadtree2', function(){
 
       it('should return more quadrants', function() {
         var qt = qtFactoryWithObjects(1000, null, 20);
-        qt.getQuadrantCount().should.above(250);
-        qt.getQuadrantCount().should.below(350);
+        qt.getQuadrantCount().should.above(200);
+        qt.getQuadrantCount().should.below(300);
       });
     });
   });

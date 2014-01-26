@@ -51,16 +51,18 @@ window.onload = function () {
   };
 
   app.drawQuadrant = function drawQuadrant(quadrant) {
+    var id, o;
     app.graphics.lineStyle(2, 0x00d900, 1);
     app.graphics.moveTo(quadrant.leftTop_.x,  quadrant.leftTop_.y);
     app.graphics.lineTo(quadrant.rightTop_.x, quadrant.rightTop_.y);
     app.graphics.lineTo(quadrant.rightBot_.x, quadrant.rightBot_.y);
     app.graphics.lineTo(quadrant.leftBot_.x,  quadrant.leftBot_.y);
     app.graphics.lineTo(quadrant.leftTop_.x,  quadrant.leftTop_.y);
-    quadrant.objects_.forEach(function(o){
+    for (id in quadrant.objects_) {
+      o = quadrant.objects_[id];
       app.graphics.lineStyle(2, 0xee2900, 1);
       app.graphics.drawCircle(o.pos_.x, o.pos_.y, o.rad_);
-    });
+    }
   };
 
   app.start = function start() {
