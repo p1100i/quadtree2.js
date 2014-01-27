@@ -4,7 +4,7 @@
  * Copyright (c) 2013-2014 burninggramma
  * https://github.com/burninggramma/quadtree2.js
  *
- * Compiled: 2014-01-26
+ * Compiled: 2014-01-27
  *
  * quadtree2 is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license.php
@@ -220,8 +220,9 @@
                     return c;
                 },
                 updateObjectQuadrants: function(a) {
-                    var b, c = (i.quadrants_[a[k.id]], m.getSmallestQuadrants(a), Object.keys(newQuadratns).sort()), d = Object.keys(oldQuadratns).sort();
-                    c !== d && (b = arrayDiff());
+                    var b, c = i.quadrants_[a[k.id]], d = m.getSmallestQuadrants(a), f = Object.keys(c), g = Object.keys(d), h = e.arrayDiffs(f, g), j = h[0], l = h[1];
+                    for (b = 0; b < j.length; b++) c[j[b]].removeObject(a[k.id]), delete c[j[b]];
+                    for (b = 0; b < l.length; b++) m.addObjectToSubtree(a, d[l[b]]);
                 },
                 addObjectToQuadrant: function(a, b) {
                     var c = a[k.id];
@@ -303,6 +304,10 @@
                     j.isDefined(a, "obj"), j.isObject(a, "obj"), m.checkInit(!0), m.setObjId(a), m.setObjShape(a), m.checkObjectKeys(a), 
                     m.addObjectToSubtree(a), i.objects_[a[k.id]] = a;
                 },
+                updateObjects: function(a) {
+                    var b;
+                    for (b = 0; b < a.length; b++) m.updateObjectQuadrants(i.objects_[a[b]]);
+                },
                 getCollidedObjects: function() {
                     return m.checkInit(!0), m.getObjectCollisionsInQuadrant(i.root_);
                 },
@@ -344,15 +349,15 @@
                 var d = a;
                 throw c && (d += "_" + c), b && (d += " - "), b && c && (d += c + ": "), b && (d += b), new Error(d);
             },
-            sortedArrayDiffs: function(a, b) {
-                var c, d = 0;
-                for (c = 0; c < a.length; c++) {
-                    if (b[d] < a[c]) for (;b[d] < a[c] && d < b.length; d++) ;
-                    a[c] !== b[d] || d++;
-                }
-                return a.filter(function(a) {
-                    return b.indexOf(a) < 0;
-                });
+            compare: function(a, b) {
+                return a > b;
+            },
+            arrayDiffs: function(a, b) {
+                var c = 0, d = 0, e = [], f = [];
+                for (a.sort(this.compare), b.sort(this.compare); c < a.length && d < b.length; ) a[c] !== b[d] ? a[c] < b[d] ? (e.push(a[c]), 
+                c++) : (f.push(b[d]), d++) : (c++, d++);
+                return c < a.length ? e.push.apply(e, a.slice(c, a.length)) : f.push.apply(f, b.slice(d, b.length)), 
+                [ e, f ];
             }
         };
         b.exports = c;

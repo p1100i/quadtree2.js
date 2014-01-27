@@ -1,5 +1,3 @@
-// jshint maxlen: 120
-
 var Vec2                = require('vec2'),
     Quadtree2Helper     = require('./quadtree2helper'),
     Quadtree2Validator  = require('./quadtree2validator'),
@@ -102,16 +100,27 @@ Quadtree2 = function Quadtree2(size, limit, idKey) {
         },
 
         updateObjectQuadrants : function updateObjectQuadrants(obj) {
-          var oldQuadrants = data.quadrants_[obj[k.id]],
-              newQuadrants = fns.getSmallestQuadrants(obj),
-              newIds       = Object.keys(newQuadratns).sort(),
-              oldIds       = Object.keys(oldQuadratns).sort(),
-              removeIds,
-              addIds;
+          var oldQuadrants  = data.quadrants_[obj[k.id]],
+              newQuadrants  = fns.getSmallestQuadrants(obj),
+              oldIds        = Object.keys(oldQuadrants),
+              newIds        = Object.keys(newQuadrants),
+              diffIds       = Quadtree2Helper.arrayDiffs(oldIds, newIds),
+              removeIds     = diffIds[0],
+              addIds        = diffIds[1],
+              i;
 
-          if(newIds === oldIds) { return; }
+          // TODO FIXME still buggy
 
-          removeIds = arrayDiff();
+          for (i = 0; i < removeIds.length; i++) {
+            // removeIds[i] is an id of a quadrant from the object should be removed
+            oldQuadrants[removeIds[i]].removeObject(obj[k.id]);
+            delete(oldQuadrants[removeIds[i]]);
+          }
+
+          for (i = 0; i < addIds.length; i++) {
+            // addIds[i] is an id of a quadrant where the object should be inserted
+            fns.addObjectToSubtree(obj, newQuadrants[addIds[i]]);
+          }
         },
 
         addObjectToQuadrant : function addObjectToQuadrant(obj, quadrant) {
@@ -302,6 +311,14 @@ Quadtree2 = function Quadtree2(size, limit, idKey) {
           fns.addObjectToSubtree(obj);
 
           data.objects_[obj[k.id]] = obj;
+        },
+
+        updateObjects : function updateObjects(ids) {
+          var i;
+
+          for(i = 0; i < ids.length; i++) {
+            fns.updateObjectQuadrants(data.objects_[ids[i]]);
+          }
         },
 
         getCollidedObjects : function getCollidedObjects() {

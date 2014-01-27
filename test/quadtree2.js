@@ -1,5 +1,3 @@
-// jshint maxlen: 120
-
 var Quadtree2 = require('../src/quadtree2'),
     Vec2      = require('vec2'),
     assert    = require('assert'),

@@ -1,31 +1,63 @@
 window.onload = function () {
   app = {
-    w : 500,
-    h : 500,
-    limit  : 4,
-    chance : 10,
-    $objCount   : document.getElementById('objcount'),
-    $quadCount  : document.getElementById('quadcount')
+    w_          : 500,
+    h_          : 500,
+    limit_      : 4,
+    chance_     : 50,
+    addChance_  : 70,
+    moveChance_ : 10,
+    movedObj_   : null,
+    change_     : false,
+    autoAdd_    : true,
+    autoMove_   : false,
+    objCount_   : 0,
+    quadCount_  : 0,
+    rerender_   : false,
+    $autoAdd    : document.getElementById('app-autoAdd'),
+    $autoAdd_   : document.getElementById('app-autoAdd_'),
+    $autoMove   : document.getElementById('app-autoMove'),
+    $autoMove_  : document.getElementById('app-autoMove_'),
+    $movedObj   : document.getElementById('app-movedObj'),
+    $movedObj_  : document.getElementById('app-movedObj_'),
+    $graphics_  : document.getElementById('app-graphics_'),
+    $objCount_  : document.getElementById('app-objCount_'),
+    $quadCount_ : document.getElementById('app-quadCount_')
   };
 
-  app.qt        = new Quadtree2(new Vec2(app.w, app.h), app.limit, undefined, true);
-  app.renderer  = PIXI.autoDetectRenderer(app.w, app.h);
+  app.qt        = new Quadtree2(new Vec2(app.w_, app.h_), app.limit_, undefined, true);
+  app.renderer  = PIXI.autoDetectRenderer(app.w_, app.h_);
   app.stage     = new PIXI.Stage(0xEFEFEF, true);
   app.graphics  = new PIXI.Graphics();
 
   app.update = function update() {
-    app.addObjectRandomly(app.chance);
-    if (app.change) {
+    if (app.autoAdd_) {
+      app.addObjectRandomly();
+    }
+
+    if (app.autoMove_) {
+      app.addAndMoveObject();
+    }
+
+    if (app.change_) {
       app.info();
       app.redraw();
-      app.change = false;
+      app.change_ = false;
+      if (app.autoMove_ && app.movedObj_) {
+        app.qt.updateObjects([app.movedObj_.id_]);
+      }
     }
+
     app.renderer.render(app.stage);
   };
 
   app.info = function info() {
-    app.$objCount.innerHTML = 'Objects: ' + app.qt.getQuadrantObjectCount();
-    app.$quadCount.innerHTML = 'Quadrants: ' + app.qt.getQuadrantCount();
+    app.quadCount_ = app.qt.getQuadrantCount();
+    app.objCount_  = app.qt.getQuadrantObjectCount();
+
+    app.$objCount_.innerHTML  = app.objCount_;
+    app.$quadCount_.innerHTML = app.quadCount_;
+    app.$autoAdd_.innerHTML   = app.autoAdd_;
+    app.$autoMove_.innerHTML  = app.autoMove_;
   }
 
   app.redraw = function redraw() {
@@ -43,11 +75,32 @@ window.onload = function () {
     }
   };
 
-  app.addObjectRandomly = function addObjectRandomly(chance) {
-    if(Math.random() * 100 < chance){
+  app.change = function change(key) {
+    if(key) app[key+'_'] = !app[key+'_'];
+    app.change_ = true;
+  };
+
+  app.chance = function chance(chance) {
+    return Math.random() * 100 < ( chance || app.chance_ );
+  };
+
+  app.addObjectRandomly = function addObjectRandomly() {
+    if(app.chance(app.addChance_)) {
       app.qt.addObject(app.createRandomObject());
-      app.change = true;
+      app.change();
     }
+  };
+
+  app.addAndMoveObject = function addAndMoveObject() {
+    if(!app.movedObj_) { return; }
+    app.movedObj_.pos_.x++;
+    app.movedObj_.pos_.y++;
+    app.change();
+  };
+
+  app.movedObj = function movedObj() {
+    app.movedObj_ = app.createRandomObject();
+    app.qt.addObject(app.movedObj_);
   };
 
   app.drawQuadrant = function drawQuadrant(quadrant) {
@@ -65,13 +118,23 @@ window.onload = function () {
     }
   };
 
+  app.autoAdd = function autoAdd() {
+    app.change('autoAdd');
+  };
+
+  app.autoMove = function autoMove() {
+    app.change('autoMove');
+  };
+
   app.start = function start() {
-    document.body.appendChild(app.renderer.view);
+    app.$graphics_.appendChild(app.renderer.view);
     app.qt.debug(true);
     app.renderer.view.style.display = 'block';
     app.stage.addChild(app.graphics);
-    app.rerender = setInterval(function(){ app.update() }, 60);
-
+    app.rerender_ = setInterval(function(){ app.update() }, 60);
+    app.$autoAdd.onclick = app.autoAdd;
+    app.$autoMove.onclick = app.autoMove;
+    app.$movedObj.onclick = app.movedObj;
   };
 
   app.start();

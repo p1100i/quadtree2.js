@@ -7,11 +7,61 @@
     <script src="../../quadtree2.min.js"></script>
     <script src="index.js"></script>
     <style>
-      body span { margin-right: 20px; } 
+      ul {
+        display : inline-block;
+        width   : 200px;
+      } 
+
+      li {
+        margin-top      : 5px;
+        padding         : 10px 10px 0 10px;
+        height          : 30px;
+        border          : 1px solid black;
+        list-style-type : none;
+        background-color: #d9d9d9;
+        cursor          : pointer;
+      }
+
+      li:hover {
+        background-color: #efefef;
+      }
+
+      li span[id] {
+        color: green;
+        float: right;
+      }
+
+      div#app-graphics_ {
+        display : inline-block;
+        height  : 500px;
+        float   : left;
+      }
     </style>
   </head>
   <body>
-    <span id='objcount'>Objects: 0</span>
-    <span id='quadcount'>Quadrants: 0</span>
+    <div id='app'>
+      <div id='app-graphics_'></div>
+      <ul>
+        <li>
+          <span>Quadrants: </span>
+          <span id='app-quadCount_'></span>
+        </li>
+        <li>
+          <span>Objects: </span>
+          <span id='app-objCount_'></span>
+        </li>
+        <li id='app-autoAdd'>
+          <span>Auto add:</span>
+          <span id='app-autoAdd_'></span>
+        </li>
+        <li id='app-autoMove'>
+          <span>Auto move:</span>
+          <span id='app-autoMove_'></span>
+        </li>
+        <li id='app-movedObj'>
+          <span>Moved obj:</span>
+          <span id='app-movedObj_'></span>
+        </li>
+    </div>
   </body>
 </html>

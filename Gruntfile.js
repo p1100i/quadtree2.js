@@ -19,7 +19,7 @@ module.exports = function(grunt) {
 
     jshint: {
       options: {
-        maxlen: 80,
+        maxlen: 120,
         quotmark: 'single'
       },
       dev: ['Gruntfile.js', 'test/*.js'],

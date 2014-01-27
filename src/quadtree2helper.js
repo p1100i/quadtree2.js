@@ -18,24 +18,43 @@ var Quadtree2Helper = {
     throw new Error(error);
   },
 
-  sortedArrayDiffs : function sortedArrayDiffs(arrA, arrB) {
-    var i,
+  compare : function compare(a,b) {
+    return a > b;
+  },
+
+  arrayDiffs : function arrayDiffs(arrA, arrB) {
+    var i = 0,
         j = 0,
         retA = [],
         retB = [];
 
-    for (i = 0; i < arrA.length; i++) {
-      if (arrB[j] < arrA[i]) {
-        for (; arrB[j] < arrA[i] && j < arrB.length; j++) {
-        }
-      }
+    arrA.sort(this.compare);
+    arrB.sort(this.compare);
 
+    while (i < arrA.length && j < arrB.length) {
       if (arrA[i] === arrB[j]) {
+        i++;
         j++;
         continue;
       }
+
+      if (arrA[i] < arrB[j]) {
+        retA.push(arrA[i]);
+        i++;
+        continue;
+      } else {
+        retB.push(arrB[j]);
+        j++;
+      }
     }
-    return arrA.filter(function(e) {return arrB.indexOf(e) < 0;});
+
+    if(i < arrA.length) {
+      retA.push.apply(retA, arrA.slice(i, arrA.length));
+    } else {
+      retB.push.apply(retB, arrB.slice(j, arrB.length));
+    }
+
+    return [retA, retB];
   }
 };
 
