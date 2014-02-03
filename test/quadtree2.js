@@ -275,4 +275,38 @@ describe('Quadtree2', function(){
       });
     });
   });
+
+  describe('#updateObjects', function(){
+    context('with moving object into a full quadrant', function() {
+      it('should increase the quadrants count', function() {
+        var qt = qtFactory(new Vec2(100, 100), 2),
+            o1 = oFactory(null, new Vec2(3,  3), 1),
+            o2 = oFactory(null, new Vec2(3,  4), 2),
+            o3 = oFactory(null, new Vec2(60, 4), 2);
+
+        qt.addObjects([o1, o2, o3]);
+        qt.getQuadrantCount().should.eql(5);
+
+        o3.pos_.x = 40;
+        qt.updateObjects([o3.id_]);
+        qt.getQuadrantCount().should.eql(9);
+      });
+    });
+
+    context('with moving object into a full quadrant', function() {
+      it('should decrease the quadrants count', function() {
+        var qt = qtFactory(new Vec2(100, 100), 2),
+            o1 = oFactory(null, new Vec2(3,  3), 1),
+            o2 = oFactory(null, new Vec2(3,  4), 2),
+            o3 = oFactory(null, new Vec2(40, 4), 2);
+
+        qt.addObjects([o1, o2, o3]);
+        qt.getQuadrantCount().should.eql(9);
+
+        o3.pos_.x = 60;
+        qt.updateObjects([o3.id_]);
+        qt.getQuadrantCount().should.eql(5);
+      });
+    });
+  });
 });
