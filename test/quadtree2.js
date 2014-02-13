@@ -2,9 +2,12 @@ var Quadtree2 = require('../src/quadtree2'),
     Vec2      = require('vec2'),
     assert    = require('assert'),
     should    = require('should'),
+    ms        = require('mocha-subject'),
     oFactory,
     qtFactory,
     qtFactoryWithObjects;
+
+ms.infect();
 
 oFactory = function oFactory(id, pos, radius, rotation) {
   var r = {
@@ -288,12 +291,13 @@ describe('Quadtree2', function(){
         qt.getQuadrantCount().should.eql(5);
 
         o3.pos_.x = 40;
+
         qt.updateObjects([o3.id_]);
         qt.getQuadrantCount().should.eql(9);
       });
     });
 
-    context('with moving object into a full quadrant', function() {
+    context('with moving object out of a full quadrant', function() {
       it('should decrease the quadrants count', function() {
         var qt = qtFactory(new Vec2(100, 100), 2),
             o1 = oFactory(null, new Vec2(3,  3), 1),
@@ -304,8 +308,35 @@ describe('Quadtree2', function(){
         qt.getQuadrantCount().should.eql(9);
 
         o3.pos_.x = 60;
+
         qt.updateObjects([o3.id_]);
         qt.getQuadrantCount().should.eql(5);
+      });
+    });
+  });
+
+  describe('#removeObject', function(){
+    context('with a nearly refactorable quadrant and subquadrants', function() {
+      subject('qt', function() {
+        var qt = qtFactory(new Vec2(100, 100), 3),
+            o1 = oFactory(1, new Vec2(3,  3), 1),
+            o2 = oFactory(2, new Vec2(3,  4), 2),
+            o3 = oFactory(3, new Vec2(3,  3), 2),
+            o4 = oFactory(4, new Vec2(40,  4), 2);
+
+        qt.addObjects([o1, o2, o3, o4]);
+
+        return qt;
+      });
+
+      it('should reassign those objects', function() {
+        // TODO use context based preset
+      });
+
+      it('should refactor recursively', function() {
+        this.qt.getQuadrantCount().should.eql(9);
+        this.qt.removeObject(4);
+        this.qt.getQuadrantCount().should.eql(1);
       });
     });
   });

@@ -1,9 +1,11 @@
-var Quadtree2Quadrant = function Quadtree2Quadrant(leftTop, size, id) {
+var Quadtree2Quadrant = function Quadtree2Quadrant(leftTop, size, id, parent) {
   this.leftTop_     = leftTop.clone();
   this.children_    = [];
   this.objects_     = {};
   this.objectCount_ = 0;
   this.id_          = id || 0;
+  this.parent_      = parent;
+  this.refactoring_ = false;
 
   this.setSize(size);
 };
@@ -31,13 +33,25 @@ Quadtree2Quadrant.prototype = {
     if (this.children_.length > 0) { return false; }
 
     this.children_.push(
-      new Quadtree2Quadrant(this.leftTop_,  this.rad_, ++this.id_),
-      new Quadtree2Quadrant(this.topMid_,   this.rad_, ++this.id_),
-      new Quadtree2Quadrant(this.leftMid_,  this.rad_, ++this.id_),
-      new Quadtree2Quadrant(this.center_,   this.rad_, ++this.id_)
+      new Quadtree2Quadrant(this.leftTop_,  this.rad_, ++this.id_, this),
+      new Quadtree2Quadrant(this.topMid_,   this.rad_, ++this.id_, this),
+      new Quadtree2Quadrant(this.leftMid_,  this.rad_, ++this.id_, this),
+      new Quadtree2Quadrant(this.center_,   this.rad_, ++this.id_, this)
     );
 
     return true;
+  },
+
+  looseChildren : function looseChildren() {
+    this.children_ = [];
+  },
+
+  addObjects : function addObjects(objs) {
+    var id;
+
+    for (id in objs) {
+      this.addObject(id, objs[id]);
+    }
   },
 
   addObject : function addObject(id, obj) {
@@ -59,15 +73,15 @@ Quadtree2Quadrant.prototype = {
     return result;
   },
 
-  getObjectCount : function getObjectCount(recursive) {
+  getObjectCount : function getObjectCount(recursive, onelevel) {
     var result = this.objectCount_;
 
     if (recursive) {
       this.children_.forEach(function(child) {
-        result += child.getObjectCount(recursive);
+        result += child.getObjectCount(!onelevel && recursive);
       });
     }
-    
+
     return result;
   },
 

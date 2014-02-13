@@ -4,7 +4,7 @@
  * Copyright (c) 2013-2014 burninggramma
  * https://github.com/burninggramma/quadtree2.js
  *
- * Compiled: 2014-01-27
+ * Compiled: 2014-02-13
  *
  * quadtree2 is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license.php
@@ -39,9 +39,12 @@
     2: [ function(a, b) {
         !function c(a, d, e) {
             function f(a, b) {
-                return this instanceof f ? "object" == typeof a && a ? (this.y = a.y || 0, void (this.x = a.x || 0)) : (this.x = f.clean(a || 0), 
-                void (this.y = f.clean(b || 0))) : new f(a, b);
+                return this instanceof f ? (g(a) ? (b = a[1], a = a[0]) : "object" == typeof a && a && (b = a.y, a = a.x), 
+                this.x = f.clean(a || 0), void (this.y = f.clean(b || 0))) : new f(a, b);
             }
+            var g = function(a) {
+                return "[object Array]" === Object.prototype.toString.call(a);
+            };
             f.prototype = {
                 change: function(a) {
                     if (a) this.observers ? this.observers.push(a) : this.observers = [ a ]; else if (this.observers) for (var b = this.observers.length - 1; b >= 0; b--) this.observers[b](this);
@@ -59,24 +62,24 @@
                     return this.set(0, 0);
                 },
                 clone: function() {
-                    return new f(this.x, this.y);
+                    return new this.constructor(this.x, this.y);
                 },
                 negate: function(a) {
-                    return a ? new f(-this.x, -this.y) : this.set(-this.x, -this.y);
+                    return a ? new this.constructor(-this.x, -this.y) : this.set(-this.x, -this.y);
                 },
                 add: function(a, b) {
-                    return b ? new f(this.x + a.x, this.y + a.y) : (this.x += a.x, this.y += a.y, this.change());
+                    return b ? new this.constructor(this.x + a.x, this.y + a.y) : (this.x += a.x, this.y += a.y, this.change());
                 },
                 subtract: function(a, b) {
-                    return b ? new f(this.x - a.x, this.y - a.y) : (this.x -= a.x, this.y -= a.y, this.change());
+                    return b ? new this.constructor(this.x - a.x, this.y - a.y) : (this.x -= a.x, this.y -= a.y, this.change());
                 },
                 multiply: function(a, b) {
                     var c, d;
-                    return "number" != typeof a ? (c = a.x, d = a.y) : c = d = a, b ? new f(this.x * c, this.y * d) : this.set(this.x * c, this.y * d);
+                    return "number" != typeof a ? (c = a.x, d = a.y) : c = d = a, b ? new this.constructor(this.x * c, this.y * d) : this.set(this.x * c, this.y * d);
                 },
                 rotate: function(a, b, c) {
-                    var d, e, g = this.x, h = this.y, i = Math.cos(a), j = Math.sin(a);
-                    return b = b ? -1 : 1, d = i * g - b * j * h, e = b * j * g + i * h, c ? new f(d, e) : this.set(d, e);
+                    var d, e, f = this.x, g = this.y, h = Math.cos(a), i = Math.sin(a);
+                    return b = b ? -1 : 1, d = h * f - b * i * g, e = b * i * f + h * g, c ? new this.constructor(d, e) : this.set(d, e);
                 },
                 length: function() {
                     var a = this.x, b = this.y;
@@ -92,22 +95,22 @@
                 },
                 normalize: function(a) {
                     var b = this.length(), c = b < Number.MIN_VALUE ? 0 : 1 / b;
-                    return a ? new f(this.x * c, this.y * c) : this.set(this.x * c, this.y * c);
+                    return a ? new this.constructor(this.x * c, this.y * c) : this.set(this.x * c, this.y * c);
                 },
                 equal: function(a, b) {
                     return b === e && (b = a.y, a = a.x), f.clean(a) === this.x && f.clean(b) === this.y;
                 },
                 abs: function(a) {
                     var b = Math.abs(this.x), c = Math.abs(this.y);
-                    return a ? new f(b, c) : this.set(b, c);
+                    return a ? new this.constructor(b, c) : this.set(b, c);
                 },
                 min: function(a, b) {
-                    var c = this.x, d = this.y, e = a.x, g = a.y, h = e > c ? c : e, i = g > d ? d : g;
-                    return b ? new f(h, i) : this.set(h, i);
+                    var c = this.x, d = this.y, e = a.x, f = a.y, g = e > c ? c : e, h = f > d ? d : f;
+                    return b ? new this.constructor(g, h) : this.set(g, h);
                 },
                 max: function(a, b) {
-                    var c = this.x, d = this.y, e = a.x, g = a.y, h = c > e ? c : e, i = d > g ? d : g;
-                    return b ? new f(h, i) : this.set(h, i);
+                    var c = this.x, d = this.y, e = a.x, f = a.y, g = c > e ? c : e, h = d > f ? d : f;
+                    return b ? new this.constructor(g, h) : this.set(g, h);
                 },
                 clamp: function(a, b, c) {
                     var d = this.min(b, !0).max(a);
@@ -117,7 +120,7 @@
                     return this.add(a.subtract(this, !0).multiply(b), !0);
                 },
                 skew: function() {
-                    return new f(-this.y, this.x);
+                    return new this.constructor(-this.y, this.x);
                 },
                 dot: function(a) {
                     return f.clean(this.x * a.x + a.y * this.y);
@@ -132,7 +135,7 @@
                     var c, d;
                     if ("number" != typeof a ? (c = a.x, d = a.y) : c = d = a, 0 === c || 0 === d) throw new Error("division by zero");
                     if (isNaN(c) || isNaN(d)) throw new Error("NaN detected");
-                    return b ? new f(this.x / c, this.y / d) : this.set(this.x / c, this.y / d);
+                    return b ? new this.constructor(this.x / c, this.y / d) : this.set(this.x / c, this.y / d);
                 },
                 isPointOnLine: function(a, b) {
                     return (a.y - this.y) * (a.x - b.x) === (a.y - b.y) * (a.x - this.x);
@@ -151,15 +154,16 @@
                 },
                 toString: function() {
                     return "(" + this.x + ", " + this.y + ")";
-                }
-            }, f.fromArray = function(a) {
-                return new f(a[0], a[1]);
+                },
+                constructor: f
+            }, f.fromArray = function(a, b) {
+                return new (b || f)(a[0], a[1]);
             }, f.precision = d || 8;
-            var g = Math.pow(10, f.precision);
+            var h = Math.pow(10, f.precision);
             return f.clean = a || function(a) {
                 if (isNaN(a)) throw new Error("NaN detected");
                 if (!isFinite(a)) throw new Error("Infinity detected");
-                return Math.round(a) === a ? a : Math.round(a * g) / g;
+                return Math.round(a) === a ? a : Math.round(a * h) / h;
             }, f.inject = c, a || (f.fast = c(function(a) {
                 return a;
             }), "undefined" != typeof b && "object" == typeof b.exports ? b.exports = f : window.Vec2 = window.Vec2 || f), 
@@ -219,26 +223,47 @@
                     if (b || (b = i.root_), c || (c = {}), f = b.intersectingChildren(a[k.p], a[k.r]), f.length === b.getChildCount()) (d || b.intersects(a[k.p], a[k.r])) && (c[b.id_] = b); else for (e in f) m.getSmallestQuadrants(a, f[e], c, !0);
                     return c;
                 },
+                removeObjectFromQuadrants: function(a, b) {
+                    var c;
+                    void 0 === b && (b = i.quadrants_[a[k.id]]);
+                    for (c in b) m.removeObjectFromQuadrant(a, b[c]);
+                },
+                removeObjectFromQuadrant: function(a, b) {
+                    b.removeObject(a[k.id]), delete i.quadrants_[a[k.id]][b.id_], !b.hasChildren() && b.parent_ && m.refactorSubtree(b.parent_);
+                },
+                refactorSubtree: function(a) {
+                    var b, c, d, e, f;
+                    if (!a.refactoring_) {
+                        for (b = 0; b < a.children_.length; b++) if (e = a.children_[b], e.hasChildren()) return;
+                        if (d = a.getObjectCount(!0, !0), !(d > i.limit_)) {
+                            for (a.refactoring_ = !0, b = 0; b < a.children_.length; b++) {
+                                e = a.children_[b];
+                                for (c in e.objects_) f = e.objects_[c], m.removeObjectFromQuadrant(f, e), m.addObjectToQuadrant(f, a);
+                            }
+                            a.looseChildren(), a.refactoring_ = !1, a.parent_ && m.refactorSubtree(a.parent_);
+                        }
+                    }
+                },
                 updateObjectQuadrants: function(a) {
                     var b, c = i.quadrants_[a[k.id]], d = m.getSmallestQuadrants(a), f = Object.keys(c), g = Object.keys(d), h = e.arrayDiffs(f, g), j = h[0], l = h[1];
-                    for (b = 0; b < j.length; b++) c[j[b]].removeObject(a[k.id]), delete c[j[b]];
-                    for (b = 0; b < l.length; b++) m.addObjectToSubtree(a, d[l[b]]);
+                    for (b = 0; b < l.length; b++) m.populateSubtree(a, d[l[b]]);
+                    for (b = 0; b < j.length; b++) c[j[b]] && m.removeObjectFromQuadrant(a, c[j[b]]);
                 },
                 addObjectToQuadrant: function(a, b) {
                     var c = a[k.id];
                     void 0 === i.quadrants_[c] && (i.quadrants_[c] = {}), i.quadrants_[c][b.id_] = b, b.addObject(c, a);
                 },
-                addObjectToSubtree: function(a, b) {
+                populateSubtree: function(a, b) {
                     var c, d, e;
                     if (b || (b = i.root_), b.hasChildren()) {
                         d = m.getSmallestQuadrants(a, b);
                         for (c in d) {
                             if (d[c] === b) return void m.addObjectToQuadrant(a, b);
-                            m.addObjectToSubtree(a, d[c]);
+                            m.populateSubtree(a, d[c]);
                         }
                     } else if (b.getObjectCount() < i.limit_) m.addObjectToQuadrant(a, b); else {
                         b.makeChildren(), e = b.removeObjects(), e[a[k.id]] = a;
-                        for (c in e) m.addObjectToSubtree(e[c], b);
+                        for (c in e) m.populateSubtree(e[c], b);
                     }
                 },
                 getObjectCollisionsInQuadrant: function(a) {
@@ -302,7 +327,10 @@
                 },
                 addObject: function(a) {
                     j.isDefined(a, "obj"), j.isObject(a, "obj"), m.checkInit(!0), m.setObjId(a), m.setObjShape(a), m.checkObjectKeys(a), 
-                    m.addObjectToSubtree(a), i.objects_[a[k.id]] = a;
+                    m.populateSubtree(a), i.objects_[a[k.id]] = a;
+                },
+                removeObject: function(a) {
+                    m.removeObjectFromQuadrants(i.objects_[a]), delete i.objects_[a];
                 },
                 updateObjects: function(a) {
                     var b;
@@ -363,9 +391,9 @@
         b.exports = c;
     }, {} ],
     5: [ function(a, b) {
-        var c = function(a, b, c) {
+        var c = function(a, b, c, d) {
             this.leftTop_ = a.clone(), this.children_ = [], this.objects_ = {}, this.objectCount_ = 0, this.id_ = c || 0, 
-            this.setSize(b);
+            this.parent_ = d, this.refactoring_ = !1, this.setSize(b);
         };
         c.prototype = {
             setSize: function(a) {
@@ -375,8 +403,15 @@
                 this.leftMid_.x = this.leftTop_.x, this.topMid_ = this.center_.clone(), this.topMid_.y = this.leftTop_.y);
             },
             makeChildren: function() {
-                return this.children_.length > 0 ? !1 : (this.children_.push(new c(this.leftTop_, this.rad_, ++this.id_), new c(this.topMid_, this.rad_, ++this.id_), new c(this.leftMid_, this.rad_, ++this.id_), new c(this.center_, this.rad_, ++this.id_)), 
+                return this.children_.length > 0 ? !1 : (this.children_.push(new c(this.leftTop_, this.rad_, ++this.id_, this), new c(this.topMid_, this.rad_, ++this.id_, this), new c(this.leftMid_, this.rad_, ++this.id_, this), new c(this.center_, this.rad_, ++this.id_, this)), 
                 !0);
+            },
+            looseChildren: function() {
+                this.children_ = [];
+            },
+            addObjects: function(a) {
+                var b;
+                for (b in a) this.addObject(b, a[b]);
             },
             addObject: function(a, b) {
                 this.objectCount_++, this.objects_[a] = b;
@@ -389,11 +424,11 @@
                 var b = this.objects_[a];
                 return this.objectCount_--, delete this.objects_[a], b;
             },
-            getObjectCount: function(a) {
-                var b = this.objectCount_;
-                return a && this.children_.forEach(function(c) {
-                    b += c.getObjectCount(a);
-                }), b;
+            getObjectCount: function(a, b) {
+                var c = this.objectCount_;
+                return a && this.children_.forEach(function(d) {
+                    c += d.getObjectCount(!b && a);
+                }), c;
             },
             intersectingChildren: function(a, b) {
                 return this.children_.filter(function(c) {
@@ -449,10 +484,10 @@
                 "object" != typeof a && c.thrower("NaO", "Not an Object", b);
             },
             hasKey: function(a, b, d) {
-                -1 === Object.keys(a).indexOf(b) && c.thrower("OhnK", "Object has no key", d + b);
+                -1 === Object.keys(a).indexOf(b.toString()) && c.thrower("OhnK", "Object has no key", d + b);
             },
             hasNoKey: function(a, b, d) {
-                -1 !== Object.keys(a).indexOf(b) && c.thrower("OhK", "Object has key", d + b);
+                -1 !== Object.keys(a).indexOf(b.toString()) && c.thrower("OhK", "Object has key", d + b);
             },
             fnFalse: function(a) {
                 a() && c.thrower("FarT", "function already returns true", c.fnName(a));

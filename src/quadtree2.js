@@ -99,6 +99,67 @@ Quadtree2 = function Quadtree2(size, limit, idKey) {
           return smallestQuadrants;
         },
 
+        removeObjectFromQuadrants : function removeObjectFromQuadrants(obj, quadrants) {
+          var id;
+
+          if (quadrants === undefined) { quadrants = data.quadrants_[obj[k.id]]; }
+
+          for (id in quadrants) { fns.removeObjectFromQuadrant(obj, quadrants[id]); }
+        },
+
+        removeObjectFromQuadrant : function removeObjectFromQuadrant(obj, quadrant) {
+          quadrant.removeObject(obj[k.id]);
+
+          delete data.quadrants_[obj[k.id]][quadrant.id_];
+
+          if (quadrant.hasChildren() || !quadrant.parent_) { return; }
+
+          fns.refactorSubtree(quadrant.parent_);
+        },
+
+        refactorSubtree : function refactorSubtree(quadrant) {
+          var i,
+              id,
+              count,
+              child,
+              obj;
+
+          if (quadrant.refactoring_) { return; }
+
+          // Lets check for children.
+          for (i = 0; i < quadrant.children_.length; i++) {
+            child = quadrant.children_[i];
+
+            if (child.hasChildren()) {
+              return;
+            }
+          }
+
+          count = quadrant.getObjectCount(true, true);
+
+          if (count > data.limit_) { return; }
+
+          quadrant.refactoring_ = true;
+
+          for (i = 0; i < quadrant.children_.length; i++) {
+            child = quadrant.children_[i];
+
+            for (id in child.objects_) {
+              obj = child.objects_[id];
+              fns.removeObjectFromQuadrant(obj, child);
+              fns.addObjectToQuadrant(obj, quadrant);
+            }
+          }
+
+          quadrant.looseChildren();
+
+          quadrant.refactoring_ = false;
+
+          if (!quadrant.parent_) { return; }
+
+          fns.refactorSubtree(quadrant.parent_);
+        },
+
         updateObjectQuadrants : function updateObjectQuadrants(obj) {
           var oldQuadrants  = data.quadrants_[obj[k.id]],
               newQuadrants  = fns.getSmallestQuadrants(obj),
@@ -109,30 +170,26 @@ Quadtree2 = function Quadtree2(size, limit, idKey) {
               addIds        = diffIds[1],
               i;
 
-          // TODO FIXME still buggy
-
-          for (i = 0; i < removeIds.length; i++) {
-            // removeIds[i] is an id of a quadrant from the object should be removed
-            oldQuadrants[removeIds[i]].removeObject(obj[k.id]);
-            delete(oldQuadrants[removeIds[i]]);
+          for (i = 0; i < addIds.length; i++) {
+            fns.populateSubtree(obj, newQuadrants[addIds[i]]);
           }
 
-          for (i = 0; i < addIds.length; i++) {
-            // addIds[i] is an id of a quadrant where the object should be inserted
-            fns.addObjectToSubtree(obj, newQuadrants[addIds[i]]);
+          for (i = 0; i < removeIds.length; i++) {
+            if (!oldQuadrants[removeIds[i]]) { continue; }
+            fns.removeObjectFromQuadrant(obj, oldQuadrants[removeIds[i]]);
           }
         },
 
         addObjectToQuadrant : function addObjectToQuadrant(obj, quadrant) {
           var id = obj[k.id];
-          if(data.quadrants_[id] === undefined) data.quadrants_[id] = {};
+          if (data.quadrants_[id] === undefined) data.quadrants_[id] = {};
           data.quadrants_[id][quadrant.id_] = quadrant;
           quadrant.addObject(id, obj);
         },
 
         // Supposes that the quadrant is the smallest one without children
         // or with children whom all intersect the obj.
-        addObjectToSubtree : function addObjectToSubtree(obj, quadrant) {
+        populateSubtree : function populateSubtree(obj, quadrant) {
           var id,
               addBySubtree,
               smallestQs,
@@ -152,7 +209,7 @@ Quadtree2 = function Quadtree2(size, limit, idKey) {
                 return;
               }
               // Propagate further to children
-              fns.addObjectToSubtree(obj, smallestQs[id]);
+              fns.populateSubtree(obj, smallestQs[id]);
             }
 
           } else if (quadrant.getObjectCount() < data.limit_) {
@@ -168,7 +225,7 @@ Quadtree2 = function Quadtree2(size, limit, idKey) {
             objs[obj[k.id]] = obj;
 
             // Recalculate all objects which were stored before.
-            for (id in objs) { fns.addObjectToSubtree(objs[id], quadrant); }
+            for (id in objs) { fns.populateSubtree(objs[id], quadrant); }
           }
         },
 
@@ -297,9 +354,6 @@ Quadtree2 = function Quadtree2(size, limit, idKey) {
         },
 
         addObject : function addObject(obj) {
-          var i,
-              smallestQs;
-
           validator.isDefined(obj, 'obj');
           validator.isObject(obj, 'obj');
 
@@ -308,9 +362,15 @@ Quadtree2 = function Quadtree2(size, limit, idKey) {
           fns.setObjShape(obj);
           fns.checkObjectKeys(obj);
 
-          fns.addObjectToSubtree(obj);
+          fns.populateSubtree(obj);
 
           data.objects_[obj[k.id]] = obj;
+        },
+
+        removeObject : function removeObject(id) {
+          fns.removeObjectFromQuadrants(data.objects_[id]);
+
+          delete data.objects_[id];
         },
 
         updateObjects : function updateObjects(ids) {
