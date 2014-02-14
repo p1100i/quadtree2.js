@@ -7,17 +7,12 @@ var Quadtree2 = require('../src/quadtree2'),
     qtFactoryWithObjects;
 
 
-oFactory = function oFactory(id, pos, radius, rotation) {
+oFactory = function oFactory(id, pos, radius) {
   var r = {
-    id_   : id  || 1,
-    pos_  : pos || new Vec2(2,3)
+    id_   : id,
+    pos_  : pos     || new Vec2(2,3),
+    rad_  : radius  || 2
   };
-
-  if(rotation) {
-    r.rot_ = rotation;
-  } else {
-    r.rad_ = radius || 2;
-  }
 
   return r;
 };
@@ -104,13 +99,6 @@ describe('Quadtree2', function(){
         qt.addObject.bind(null, 1).should.throw(/^NaO_obj/);
       });
 
-      it('should throw ND_rot_', function() {
-        var qt = qtFactory(),
-            o  = { pos_ : new Vec2(1,2) };
-
-        qt.addObject.bind(null, o).should.throw(/^ND_rot_/);
-      });
-
       it('should throw NaN_rad_', function() {
         var qt = qtFactory(),
             o  = { pos_ : new Vec2(1,2), rad_ : 'x' };
@@ -121,12 +109,12 @@ describe('Quadtree2', function(){
 
     context('with obj id based configuration', function() {
       context('without obj id defined', function() {
-        it('should throw ND_id_', function() {
+        it('should throw NaN_id_', function() {
           var qt = qtFactory(),
               o  = { pos_ : new Vec2(1,2), rad_ : 3 };
 
           qt.setObjectKey('id', 'id_');
-          qt.addObject.bind(null, o).should.throw(/^ND_id_/);
+          qt.addObject.bind(null, o).should.throw(/^NaN_id_/);
         });
       });
 
@@ -136,11 +124,11 @@ describe('Quadtree2', function(){
               o1 = oFactory(),
               o2 = oFactory();
 
-          o2.id_ = o1.id_ = 'x';
+          o2.id_ = o1.id_ = 2;
 
           qt.setObjectKey('id', 'id_');
           qt.addObject.bind(null, o1).should.not.throw();
-          qt.addObject.bind(null, o2).should.throw(/^OhK_id_x/);
+          qt.addObject.bind(null, o2).should.throw(/^OhK_id_2/);
         });
       });
     });
@@ -190,16 +178,16 @@ describe('Quadtree2', function(){
     });
 
     context('with some colliding objects', function() {
-      it('should return the two objects', function() {
+      it('should return the two objects in the correct order', function() {
         var qt = qtFactory(),
-            o1 = oFactory(null, new Vec2(20,20), 5),
-            o2 = oFactory(null, new Vec2(22,22), 5),
-            o3 = oFactory(null, new Vec2(32,42), 5);
+            o1 = oFactory(3, new Vec2(20,20), 5),
+            o2 = oFactory(2, new Vec2(22,22), 5),
+            o3 = oFactory(4, new Vec2(32,42), 5);
 
         qt.addObjects([o1, o2, o3]);
 
-        qt.getCollidedObjects().should.containEql([o1, o2]);
-        qt.getCollidedObjects().should.not.containEql([o2, o1]);
+        qt.getCollidedObjects().should.containEql([o2, o1]);
+        qt.getCollidedObjects().should.not.containEql([o1, o2]);
       });
     });
   });
