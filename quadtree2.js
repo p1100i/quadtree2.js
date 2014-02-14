@@ -181,12 +181,10 @@
                 inited_: !1,
                 limit_: void 0,
                 size_: void 0,
-                shapes_: {},
                 quadrants_: {}
             }, j = new f(), k = {
                 p: "pos_",
                 r: "rad_",
-                R: "rot_",
                 id: "id_"
             }, l = {
                 data: {
@@ -203,11 +201,6 @@
                         necessary: {
                             r: j.isNumber
                         }
-                    },
-                    r: {
-                        necessary: {
-                            R: j.isNumber
-                        }
                     }
                 }
             }, m = {
@@ -215,8 +208,7 @@
                     return ++i.ids_;
                 },
                 hasCollision: function(a, b) {
-                    return ("c" !== m.getObjShape(a) || "c" !== m.getObjShape(b)) && e.thrower("NIY", "Collision handling does not work for rects YET!"), 
-                    a[k.r] + b[k.r] > a[k.p].distance(b[k.p]);
+                    return a[k.r] + b[k.r] > a[k.p].distance(b[k.p]);
                 },
                 getSmallestQuadrants: function(a, b, c, d) {
                     var e, f;
@@ -270,7 +262,7 @@
                     var b, c, d = a.getObjects(!0), e = [], f = [];
                     for (b in d) {
                         f.push(b);
-                        for (c in d) -1 === f.indexOf(c) && m.hasCollision(d[b], d[c]) && e.push([ d[b], d[c] ]);
+                        for (c in d) -1 === f.indexOf(c) && m.hasCollision(d[b], d[c]) && e.push(c > b ? [ d[b], d[c] ] : [ d[c], d[b] ]);
                     }
                     return e;
                 },
@@ -281,18 +273,10 @@
                     return a && !i.inited_ && m.init(), i.inited_;
                 },
                 checkObjectKeys: function(a) {
-                    j.isDefined(a[k.id], k.id), j.hasNoKey(i.objects_, a[k.id], k.id), j.byCallbackObject(a, l.k.necessary, k), 
-                    j.byCallbackObject(a, l.k[m.getObjShape(a)].necessary, k);
+                    j.isNumber(a[k.id], k.id), j.isNumber(a[k.r], k.r), j.hasNoKey(i.objects_, a[k.id], k.id), j.byCallbackObject(a, l.k.necessary, k);
                 },
                 setObjId: function(a) {
-                    i.autoId_ && (a[k.id] = m.nextId());
-                },
-                setObjShape: function(a) {
-                    var b = void 0 === a[k.r], c = b ? k.R : k.r;
-                    j.isDefined(a[c], c), i.shapes_[a[k.id]] = b ? "r" : "c";
-                },
-                getObjShape: function(a) {
-                    return i.shapes_[a[k.id]];
+                    i.autoId_ && !a[k.id] && (a[k.id] = m.nextId());
                 }
             }, n = {
                 getQuadrants: function() {
@@ -326,8 +310,8 @@
                     });
                 },
                 addObject: function(a) {
-                    j.isDefined(a, "obj"), j.isObject(a, "obj"), m.checkInit(!0), m.setObjId(a), m.setObjShape(a), m.checkObjectKeys(a), 
-                    m.populateSubtree(a), i.objects_[a[k.id]] = a;
+                    j.isDefined(a, "obj"), j.isObject(a, "obj"), m.checkInit(!0), m.setObjId(a), m.checkObjectKeys(a), m.populateSubtree(a), 
+                    i.objects_[a[k.id]] = a;
                 },
                 removeObject: function(a) {
                     m.removeObjectFromQuadrants(i.objects_[a]), delete i.objects_[a];

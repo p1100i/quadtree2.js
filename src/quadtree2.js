@@ -16,7 +16,6 @@ Quadtree2 = function Quadtree2(size, limit, idKey) {
         inited_    : false,
         limit_     : undefined,
         size_      : undefined,
-        shapes_    : {},
         quadrants_ : {}
       },
 
@@ -26,7 +25,6 @@ Quadtree2 = function Quadtree2(size, limit, idKey) {
       k = {
         p  : 'pos_',
         r  : 'rad_',
-        R  : 'rot_',
         id : 'id_'
       },
 
@@ -48,12 +46,6 @@ Quadtree2 = function Quadtree2(size, limit, idKey) {
             necessary : {
               r : validator.isNumber
             },
-          },
-
-          r : {
-            necessary : {
-              R : validator.isNumber
-            },
           }
         }
       },
@@ -65,9 +57,6 @@ Quadtree2 = function Quadtree2(size, limit, idKey) {
         },
 
         hasCollision : function hasCollision(objA, objB) {
-          if (fns.getObjShape(objA) !== 'c' || fns.getObjShape(objB) !== 'c') {
-            Quadtree2Helper.thrower('NIY', 'Collision handling does not work for rects YET!');
-          }
           return objA[k.r] + objB[k.r] > objA[k.p].distance(objB[k.p]);
         },
 
@@ -241,7 +230,7 @@ Quadtree2 = function Quadtree2(size, limit, idKey) {
                 if (checkedIds.indexOf(idB) !== -1) { continue; }
 
                 if (fns.hasCollision(objects[idA], objects[idB])) {
-                  collidedObjectPairs.push([objects[idA], objects[idB]]);
+                  collidedObjectPairs.push(idA < idB ? [objects[idA], objects[idB]] : [objects[idB], objects[idA]]);
                 }
               }
             }
@@ -263,36 +252,17 @@ Quadtree2 = function Quadtree2(size, limit, idKey) {
         },
 
         checkObjectKeys : function checkObjectKeys(obj) {
-          validator.isDefined(obj[k.id], k.id);
+          validator.isNumber(obj[k.id], k.id);
+          validator.isNumber(obj[k.r], k.r);
           validator.hasNoKey(data.objects_, obj[k.id], k.id);
-
           validator.byCallbackObject(obj, constraints.k.necessary, k);
-
-          validator.byCallbackObject(
-            obj,
-            constraints.k[fns.getObjShape(obj)].necessary,
-            k
-          );
         },
 
         setObjId : function setObjId(obj) {
-          if (data.autoId_) {
+          if (data.autoId_ && !obj[k.id]) {
             obj[k.id] = fns.nextId();
           }
         },
-
-        setObjShape : function setObjShape(obj) {
-          var rect = obj[k.r] === undefined,
-              key  = rect ? k.R : k.r;
-
-          validator.isDefined(obj[key], key);
-
-          data.shapes_[obj[k.id]] = rect ? 'r' : 'c';
-        },
-
-        getObjShape : function getObjShape(obj) {
-          return data.shapes_[obj[k.id]];
-        }
       },
 
       // Debug functions
@@ -357,7 +327,6 @@ Quadtree2 = function Quadtree2(size, limit, idKey) {
 
           fns.checkInit(true);
           fns.setObjId(obj);
-          fns.setObjShape(obj);
           fns.checkObjectKeys(obj);
 
           fns.populateSubtree(obj);
