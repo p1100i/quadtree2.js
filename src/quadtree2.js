@@ -187,8 +187,6 @@ Quadtree2 = function Quadtree2(size, limit, idKey) {
           quadrant.addObject(id, obj);
         },
 
-        // Supposes that the quadrant is the smallest one without children
-        // or with children whom all intersect the obj.
         populateSubtree : function populateSubtree(obj, quadrant) {
           var id,
               addBySubtree,
@@ -411,6 +409,8 @@ Quadtree2 = function Quadtree2(size, limit, idKey) {
             fns.checkInit(true);
             for (id in debugFns)  { this[id] = debugFns[id]; }
             for (id in fns)       { this[id] = fns[id]; }
+
+            this.data_ = data;
           }
 
           return data.debug_;

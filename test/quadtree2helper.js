@@ -1,13 +1,10 @@
 var Quadtree2Helper = require('../src/quadtree2helper'),
     assert          = require('assert'),
     should          = require('should'),
-    ms              = require('mocha-subject'),
     shortArr        = [3,1,2],
     shortSortedArr  = [1,2,3],
     longArr         = [5,6,7,4,3,8,9],
     longSortedArr   = [3,4,5,6,7,8,9];
-
-ms.infect();
 
 describe('Quadtree2Helper', function(){
   describe('.arrayDiffs', function(){
@@ -36,7 +33,7 @@ describe('Quadtree2Helper', function(){
         Quadtree2Helper.arrayDiffs(shortSortedArr, longArr).should.eql([[1,2], [4,5,6,7,8,9]]);
       });
 
-      it('aaa should return only the different content', function() {
+      it('should return only the different content', function() {
         Quadtree2Helper.arrayDiffs(longArr, [9, 5, 1, 10]).should.eql([[3,4,6,7,8], [1, 10]]);
       });
     });

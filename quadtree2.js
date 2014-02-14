@@ -4,7 +4,7 @@
  * Copyright (c) 2013-2014 burninggramma
  * https://github.com/burninggramma/quadtree2.js
  *
- * Compiled: 2014-02-13
+ * Compiled: 2014-02-14
  *
  * quadtree2 is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license.php
@@ -354,6 +354,7 @@
                         i.debug_ = a, m.checkInit(!0);
                         for (b in n) this[b] = n[b];
                         for (b in m) this[b] = m[b];
+                        this.data_ = i;
                     }
                     return i.debug_;
                 }

@@ -23,7 +23,6 @@
   },
   "devDependencies": {
     "mocha"               : "latest",
-    "mocha-subject"       : "latest",
     "should"              : "latest",
     "grunt"               : "latest",
     "grunt-cli"           : "latest",
