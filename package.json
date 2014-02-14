@@ -1,6 +1,6 @@
 {
   "name"        : "quadtree2",
-  "description" : "Two dimensional quadtree for regions and collision detection.",
+  "description" : "JavaScript implementation of quadtree datastructure for collision detection.",
   "author"      : "Burning Gramma <burninggramma@gmail.com>",
   "version"     : "0.0.1",
   "main"        : "src/quadtree2.js",
