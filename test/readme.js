@@ -62,6 +62,7 @@ describe('README', function() {
       // Update our data structure
       quadtree.updateObject(rocket);
       
+      // Lets get the deadly hit
       bobsDeadlyCollisions = quadtree.getCollisionsForObject(bob);
       // Object.keys(bobsDeadlyCollisions).length;
       // >> 1;

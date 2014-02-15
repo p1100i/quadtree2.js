@@ -71,6 +71,7 @@ Upon adding objects to the quadtree you either specify the unique number identif
     // Update our data structure
     quadtree.updateObject(rocket);
     
+    // Lets get the deadly hit
     bobsDeadlyCollisions = quadtree.getCollisionsForObject(bob);
     // Object.keys(bobsDeadlyCollisions).length;
     // >> 1;
