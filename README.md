@@ -17,39 +17,63 @@ Upon adding objects to the quadtree you either specify the unique number identif
 
 ## Use
 
-    var // Variable to store positions
-        collisions,
+    var // Variable to save the collisions
+        alicesCollisions,
+        bobsCollisions,
+        bobsDeadlyCollisions,
 
         // This will initialize a quadtree with a 100x100 resolution,
         // with an object limit of 3 inside a quadrant.
-        qt = new Quadtree2(new Vec2(100, 100), 3),
+        quadtree = new Quadtree2(new Vec2(100, 100), 3),
 
-        // The objects we will add to the quadtree.
-        objects = [
-          {
+        // Alice will be staying fierce in the top left ...
+        alice = {
+          pos_ : new Vec2(20, 20),
+          rad_ : 3
+        },
+
+        // ... with his rocket luncher, gonna try to shoot bob ...
+        rocket = {
             pos_ : new Vec2(20, 20),
-            rad_ : 3
-          },
-          {
-            pos_ : new Vec2(21, 21),
-            rad_ : 3
-          },
-          {
-            pos_ : new Vec2(50, 50),
-            rad_ : 40
-          },
-          {
-            pos_ : new Vec2(70, 70),
-            rad_ : 2
-          }
-        ];
+            rad_ : 5
+        },
 
-    // Insert the objects into the quadtree.
-    qt.addObjects(objects);
+        // ... however there is a bunker on the field ...
+        bunker = {
+          pos_ : new Vec2(50, 50),
+          rad_ : 10
+        },
 
-    // Get the collsision in an array of arrays [[objA, objB], ... ]
-    collisions = qt.getCollidedObjects();
-    // END README
+        // ... will it save bob?
+        bob = {
+          pos_ : new Vec2(80, 80),
+          rad_ : 3
+        };
+
+
+    // Add all of our beloved character to the quadtree.
+    quadtree.addObjects([alice, rocket, bunker, bob]);
+
+    // On the start Alice collides with her own rocket.
+    alicesCollisions = quadtree.getCollisionsForObject(alice);
+    // Object.keys(alicesCollisions).length;
+    // >> 1;
+
+    // Bob is just sitting and waiting.
+    bobsCollisions = quadtree.getCollisionsForObject(bob);
+    // Object.keys(bobsCollisions).length;
+    // >> 0;
+
+    // The rocket flys over to bob
+    rocket.pos_.x = 78;
+    rocket.pos_.y = 78;
+
+    // Update our data structure
+    quadtree.updateObject(rocket);
+    
+    bobsDeadlyCollisions = quadtree.getCollisionsForObject(bob);
+    // Object.keys(bobsDeadlyCollisions).length;
+    // >> 1;
 
 ## License
 [MIT License][git-LICENSE]

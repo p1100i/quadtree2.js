@@ -4,7 +4,7 @@
  * Copyright (c) 2013-2014 burninggramma
  * https://github.com/burninggramma/quadtree2.js
  *
- * Compiled: 2014-02-14
+ * Compiled: 2014-02-15
  *
  * quadtree2 is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license.php
@@ -174,14 +174,15 @@
         var c, d = a("vec2"), e = a("./quadtree2helper"), f = a("./quadtree2validator"), g = a("./quadtree2quadrant");
         c = function(a, b, c) {
             var h, i = {
-                root_: new g(new d(0, 0)),
                 objects_: {},
-                ids_: 0,
+                quadrants_: {},
+                ids_: 1,
+                quadrantIds_: 1,
                 autoId_: !0,
                 inited_: !1,
                 limit_: void 0,
                 size_: void 0,
-                quadrants_: {}
+                root_: void 0
             }, j = new f(), k = {
                 p: "pos_",
                 r: "rad_",
@@ -205,7 +206,11 @@
                 }
             }, m = {
                 nextId: function() {
-                    return ++i.ids_;
+                    return i.ids_++;
+                },
+                nextQuadrantId: function(a) {
+                    var b = i.quadrantIds_;
+                    return i.quadrantIds_ += a || 1, b;
                 },
                 hasCollision: function(a, b) {
                     return a[k.r] + b[k.r] > a[k.p].distance(b[k.p]);
@@ -214,6 +219,12 @@
                     var e, f;
                     if (b || (b = i.root_), c || (c = {}), f = b.intersectingChildren(a[k.p], a[k.r]), f.length === b.getChildCount()) (d || b.intersects(a[k.p], a[k.r])) && (c[b.id_] = b); else for (e in f) m.getSmallestQuadrants(a, f[e], c, !0);
                     return c;
+                },
+                removeQuadrantObjects: function(a) {
+                    var b;
+                    result = a.removeObjects();
+                    for (b in result) delete i.quadrants_[b][a.id_];
+                    return result;
                 },
                 removeObjectFromQuadrants: function(a, b) {
                     var c;
@@ -254,20 +265,13 @@
                             m.populateSubtree(a, d[c]);
                         }
                     } else if (b.getObjectCount() < i.limit_) m.addObjectToQuadrant(a, b); else {
-                        b.makeChildren(), e = b.removeObjects(), e[a[k.id]] = a;
+                        b.makeChildren(m.nextQuadrantId(4)), e = m.removeQuadrantObjects(b), e[a[k.id]] = a;
                         for (c in e) m.populateSubtree(e[c], b);
                     }
                 },
-                getObjectCollisionsInQuadrant: function(a) {
-                    var b, c, d = a.getObjects(!0), e = [], f = [];
-                    for (b in d) {
-                        f.push(b);
-                        for (c in d) -1 === f.indexOf(c) && m.hasCollision(d[b], d[c]) && e.push(c > b ? [ d[b], d[c] ] : [ d[c], d[b] ]);
-                    }
-                    return e;
-                },
                 init: function() {
-                    j.byCallbackObject(i, l.data.necessary), i.root_.setSize(i.size_.clone()), i.inited_ = !0;
+                    j.byCallbackObject(i, l.data.necessary), i.root_ = new g(new d(0, 0), i.size_.clone(), m.nextQuadrantId()), 
+                    i.inited_ = !0;
                 },
                 checkInit: function(a) {
                     return a && !i.inited_ && m.init(), i.inited_;
@@ -277,6 +281,20 @@
                 },
                 setObjId: function(a) {
                     i.autoId_ && !a[k.id] && (a[k.id] = m.nextId());
+                },
+                removeObjectById: function(a) {
+                    j.hasKey(i.objects_, a, k.id), m.removeObjectFromQuadrants(i.objects_[a]), delete i.objects_[a];
+                },
+                updateObjectById: function(a) {
+                    j.hasKey(i.objects_, a, k.id), m.updateObjectQuadrants(i.objects_[a]);
+                },
+                getObjectsByObject: function(a) {
+                    var b, c = {
+                        quadrants: {},
+                        objects: {}
+                    };
+                    for (b in i.quadrants_[a[k.id]]) i.quadrants_[a[k.id]][b].getObjects(c);
+                    return delete c.objects[a[k.id]], c.objects;
                 }
             }, n = {
                 getQuadrants: function() {
@@ -313,15 +331,28 @@
                     j.isDefined(a, "obj"), j.isObject(a, "obj"), m.checkInit(!0), m.setObjId(a), m.checkObjectKeys(a), m.populateSubtree(a), 
                     i.objects_[a[k.id]] = a;
                 },
+                removeObjects: function(a) {
+                    var b;
+                    for (b = 0; b < a.length; b++) o.removeObject(a[b]);
+                },
                 removeObject: function(a) {
-                    m.removeObjectFromQuadrants(i.objects_[a]), delete i.objects_[a];
+                    m.checkInit(!0), j.hasKey(a, k.id, k.id), m.removeObjectById(a[k.id]);
                 },
                 updateObjects: function(a) {
                     var b;
-                    for (b = 0; b < a.length; b++) m.updateObjectQuadrants(i.objects_[a[b]]);
+                    for (b = 0; b < a.length; b++) o.updateObject(a[b]);
                 },
-                getCollidedObjects: function() {
-                    return m.checkInit(!0), m.getObjectCollisionsInQuadrant(i.root_);
+                updateObject: function(a) {
+                    m.checkInit(!0), j.hasKey(a, k.id, k.id), m.updateObjectById(a[k.id]);
+                },
+                getPossibleCollisionsForObject: function(a) {
+                    return m.checkInit(!0), j.hasKey(a, k.id, k.id), m.getObjectsByObject(a);
+                },
+                getCollisionsForObject: function(a) {
+                    var b, c;
+                    m.checkInit(!0), j.hasKey(a, k.id, k.id), c = m.getObjectsByObject(a);
+                    for (b in c) m.hasCollision(a, c[b]) || delete c[b];
+                    return c;
                 },
                 getCount: function() {
                     return Object.keys(i.objects_).length;
@@ -387,9 +418,9 @@
                 this.rightTop_.x += a.x, this.rightBot_ = this.leftTop_.add(a, !0), this.leftMid_ = this.center_.clone(), 
                 this.leftMid_.x = this.leftTop_.x, this.topMid_ = this.center_.clone(), this.topMid_.y = this.leftTop_.y);
             },
-            makeChildren: function() {
-                return this.children_.length > 0 ? !1 : (this.children_.push(new c(this.leftTop_, this.rad_, ++this.id_, this), new c(this.topMid_, this.rad_, ++this.id_, this), new c(this.leftMid_, this.rad_, ++this.id_, this), new c(this.center_, this.rad_, ++this.id_, this)), 
-                !0);
+            makeChildren: function(a) {
+                return this.children_.length > 0 ? !1 : (this.children_.push(new c(this.leftTop_, this.rad_, a++, this), new c(this.topMid_, this.rad_, a++, this), new c(this.leftMid_, this.rad_, a++, this), new c(this.center_, this.rad_, a++, this)), 
+                a);
             },
             looseChildren: function() {
                 this.children_ = [];
@@ -441,11 +472,16 @@
             },
             getObjects: function(a, b) {
                 var c;
-                b || (b = {});
-                for (c in this.objects_) b[c] = this.objects_[c];
-                return a && this.children_.forEach(function(c) {
-                    c.getObjects(a, b);
-                }), b;
+                if (!a.quadrants[this.id_]) {
+                    a.quadrants[this.id_] = this.id_;
+                    for (c in this.objects_) {
+                        if (a.objects[c]) return;
+                        a.objects[c] = this.objects_[c];
+                    }
+                    b && 1 !== b || this.parent_ && this.parent_.getObjects(a, 1), b && -1 !== b || this.children_.forEach(function(b) {
+                        b.getObjects(a, -1);
+                    });
+                }
             }
         }, b.exports = c;
     }, {} ],
