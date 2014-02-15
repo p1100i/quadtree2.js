@@ -9,14 +9,15 @@ Quadtree2 = function Quadtree2(size, limit, idKey) {
 
       // Container for private data.
       data = {
-        root_      : new Quadtree2Quadrant(new Vec2(0,0)),
-        objects_   : {},
-        ids_       : 0,
-        autoId_    : true,
-        inited_    : false,
-        limit_     : undefined,
-        size_      : undefined,
-        quadrants_ : {}
+        objects_     : {},
+        quadrants_   : {},
+        ids_         : 1,
+        quadrantIds_ : 1,
+        autoId_      : true,
+        inited_      : false,
+        limit_       : undefined,
+        size_        : undefined,
+        root_        : undefined
       },
 
       validator = new Quadtree2Validator(),
@@ -53,7 +54,14 @@ Quadtree2 = function Quadtree2(size, limit, idKey) {
       // Private function definitions.
       fns = {
         nextId : function nextId() {
-          return ++data.ids_;
+          return data.ids_++;
+        },
+
+        nextQuadrantId : function nextQuadrantId(sum) {
+          var id = data.quadrantIds_;
+          data.quadrantIds_ += sum || 1;
+
+          return id;
         },
 
         hasCollision : function hasCollision(objA, objB) {
@@ -86,6 +94,17 @@ Quadtree2 = function Quadtree2(size, limit, idKey) {
           }
 
           return smallestQuadrants;
+        },
+
+        removeQuadrantObjects : function removeQuadrantObjects(quadrant) {
+          var id;
+              result = quadrant.removeObjects();
+
+          for (id in result) {
+            delete data.quadrants_[id][quadrant.id_];
+          }
+
+          return result;
         },
 
         removeObjectFromQuadrants : function removeObjectFromQuadrants(obj, quadrants) {
@@ -205,10 +224,10 @@ Quadtree2 = function Quadtree2(size, limit, idKey) {
 
           } else {
             // Got no place so lets make children.
-            quadrant.makeChildren();
+            quadrant.makeChildren(fns.nextQuadrantId(4));
 
             // Remove all the stored objects.
-            objs = quadrant.removeObjects();
+            objs = fns.removeQuadrantObjects(quadrant);
             objs[obj[k.id]] = obj;
 
             // Recalculate all objects which were stored before.
@@ -216,32 +235,10 @@ Quadtree2 = function Quadtree2(size, limit, idKey) {
           }
         },
 
-        getObjectCollisionsInQuadrant : function getObjectCollisionsInQuadrant(quadrant) {
-            var idA,
-                idB,
-                objects = quadrant.getObjects(true),
-                collidedObjectPairs = [],
-                checkedIds = [];
-
-            for (idA in objects) {
-              checkedIds.push(idA);
-
-              for (idB in objects) {
-                if (checkedIds.indexOf(idB) !== -1) { continue; }
-
-                if (fns.hasCollision(objects[idA], objects[idB])) {
-                  collidedObjectPairs.push(idA < idB ? [objects[idA], objects[idB]] : [objects[idB], objects[idA]]);
-                }
-              }
-            }
-
-            return collidedObjectPairs;
-        },
-
         init : function init() {
           validator.byCallbackObject(data, constraints.data.necessary);
 
-          data.root_.setSize(data.size_.clone());
+          data.root_ = new Quadtree2Quadrant(new Vec2(0,0), data.size_.clone(), fns.nextQuadrantId());
 
           data.inited_ = true;
         },
@@ -263,6 +260,36 @@ Quadtree2 = function Quadtree2(size, limit, idKey) {
             obj[k.id] = fns.nextId();
           }
         },
+
+        removeObjectById : function removeObjectById(id) {
+          validator.hasKey(data.objects_, id, k.id);
+
+          fns.removeObjectFromQuadrants(data.objects_[id]);
+
+          delete data.objects_[id];
+        },
+
+        updateObjectById : function updateObjectById(id) {
+          validator.hasKey(data.objects_, id, k.id);
+
+          fns.updateObjectQuadrants(data.objects_[id]);
+        },
+
+        getObjectsByObject : function getObjectsByObject(obj) {
+          var key,
+              result = {
+                quadrants : {},
+                objects   : {}
+              };
+
+          for (key in data.quadrants_[obj[k.id]]) {
+            data.quadrants_[obj[k.id]][key].getObjects(result);
+          }
+
+          delete result.objects[obj[k.id]];
+
+          return result.objects;
+        }
       },
 
       // Debug functions
@@ -334,26 +361,56 @@ Quadtree2 = function Quadtree2(size, limit, idKey) {
           data.objects_[obj[k.id]] = obj;
         },
 
-        removeObject : function removeObject(id) {
-          fns.removeObjectFromQuadrants(data.objects_[id]);
-
-          delete data.objects_[id];
-        },
-
-        updateObjects : function updateObjects(ids) {
+        removeObjects : function removeObjects(objs) {
           var i;
 
-          for(i = 0; i < ids.length; i++) {
-            fns.updateObjectQuadrants(data.objects_[ids[i]]);
+          for (i = 0; i < objs.length; i++) {
+            publicFns.removeObject(objs[i]);
           }
         },
 
-        getCollidedObjects : function getCollidedObjects() {
-          var result = [];
+        removeObject : function removeObject(obj) {
+          fns.checkInit(true);
+          validator.hasKey(obj, k.id, k.id);
+
+          fns.removeObjectById(obj[k.id]);
+        },
+
+        updateObjects : function updateObjects(objs) {
+          var i;
+
+          for(i = 0; i < objs.length; i++) {
+            publicFns.updateObject(objs[i]);
+          }
+        },
+
+        updateObject : function updateObject(obj) {
+          fns.checkInit(true);
+          validator.hasKey(obj, k.id, k.id);
+
+          fns.updateObjectById(obj[k.id]);
+        },
+
+        getPossibleCollisionsForObject : function getPossibleCollisionsForObject(obj) {
+          fns.checkInit(true);
+          validator.hasKey(obj, k.id, k.id);
+
+          return fns.getObjectsByObject(obj);
+        },
+
+        getCollisionsForObject : function getCollisionsForObject(obj) {
+          var id, objects;
 
           fns.checkInit(true);
+          validator.hasKey(obj, k.id, k.id);
 
-          return fns.getObjectCollisionsInQuadrant(data.root_);
+          objects = fns.getObjectsByObject(obj);
+
+          for (id in objects) {
+            if (!fns.hasCollision(obj, objects[id])) { delete objects[id]; }
+          }
+
+          return objects;
         },
 
         getCount : function getCount() {

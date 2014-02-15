@@ -1,7 +1,8 @@
-var Quadtree2 = require('../src/quadtree2'),
-    Vec2      = require('vec2'),
-    assert    = require('assert'),
-    should    = require('should'),
+var Quadtree2   = require('../src/quadtree2'),
+    Vec2        = require('vec2'),
+    assert      = require('assert'),
+    should      = require('should'),
+    defaultSize = new Vec2(100, 100),
     oFactory,
     qtFactory,
     qtFactoryWithObjects;
@@ -10,7 +11,7 @@ var Quadtree2 = require('../src/quadtree2'),
 oFactory = function oFactory(id, pos, radius) {
   var r = {
     id_   : id,
-    pos_  : pos     || new Vec2(2,3),
+    pos_  : pos     || new Vec2(Math.floor(Math.random() * defaultSize.x), Math.floor(Math.random() * defaultSize.y)),
     rad_  : radius  || 2
   };
 
@@ -18,7 +19,7 @@ oFactory = function oFactory(id, pos, radius) {
 };
 
 qtFactory = function qtFactory(size, limit, idKey){
-  if (!size)  { size = new Vec2(100, 100); }
+  if (!size)  { size = defaultSize.clone(); }
   if (!limit) { limit = 4; }
 
   return new Quadtree2(size, limit, idKey, true);
@@ -164,37 +165,9 @@ describe('Quadtree2', function(){
     });
   });
 
-  describe('#getCollidedObjects', function(){
-    context('with non-colliding objects', function() {
-      it('should return an empty array', function() {
-        var qt = qtFactory(),
-            o1 = oFactory(null, new Vec2(20,20), 5),
-            o2 = oFactory(null, new Vec2(42,52), 5);
-
-        qt.addObjects([o1, o2]);
-
-        qt.getCollidedObjects().should.eql([]);
-      });
-    });
-
-    context('with some colliding objects', function() {
-      it('should return the two objects in the correct order', function() {
-        var qt = qtFactory(),
-            o1 = oFactory(3, new Vec2(20,20), 5),
-            o2 = oFactory(2, new Vec2(22,22), 5),
-            o3 = oFactory(4, new Vec2(32,42), 5);
-
-        qt.addObjects([o1, o2, o3]);
-
-        qt.getCollidedObjects().should.containEql([o2, o1]);
-        qt.getCollidedObjects().should.not.containEql([o1, o2]);
-      });
-    });
-  });
-
   describe('#getQuadrantCount', function(){
     context('with some objects', function() {
-      it('should behave correct', function() {
+      it('should behave correctly', function() {
         var qt = qtFactory(new Vec2(100, 100), 1),
             o1 = oFactory(null, new Vec2(2,2), 1),
             o2 = oFactory(null, new Vec2(98,98), 1),
@@ -235,7 +208,7 @@ describe('Quadtree2', function(){
         qt.getQuadrantCount().should.eql(17);
       });
 
-      it('should behave correct', function() {
+      it('should behave correctly', function() {
         var qt = qtFactory(new Vec2(100, 100), 4),
             o1 = oFactory(null, new Vec2(2,2), 1),
             o2 = oFactory(null, new Vec2(4,4), 1),
@@ -258,9 +231,9 @@ describe('Quadtree2', function(){
       });
 
       it('should return more quadrants', function() {
-        var qt = qtFactoryWithObjects(1000, null, 20);
-        qt.getQuadrantCount().should.above(200);
-        qt.getQuadrantCount().should.below(300);
+        var qt = qtFactoryWithObjects(1000, new Vec2(1000, 1000), 20);
+        qt.getQuadrantCount().should.above(50);
+        qt.getQuadrantCount().should.below(150);
       });
     });
   });
@@ -289,7 +262,7 @@ describe('Quadtree2', function(){
 
         o3.pos_.x = 40;
 
-        this.qt.updateObjects([o3.id_]);
+        this.qt.updateObject(o3);
         this.qt.getQuadrantCount().should.eql(9);
       });
     });
@@ -303,7 +276,7 @@ describe('Quadtree2', function(){
 
         o3.pos_.x = 60;
 
-        this.qt.updateObjects([o3.id_]);
+        this.qt.updateObject(o3);
         this.qt.getQuadrantCount().should.eql(5);
       });
     });
@@ -320,6 +293,7 @@ describe('Quadtree2', function(){
 
         qt.addObjects([o1, o2, o3, o4]);
 
+        this.o4 = o4;
         this.qt = qt;
       });
 
@@ -328,7 +302,7 @@ describe('Quadtree2', function(){
       });
 
       it('should reassign those objects', function() {
-        this.qt.removeObject(4);
+        this.qt.removeObject(this.o4);
         this.qt.debug(true);
         this.qt.getCount().should.eql(3);
 
@@ -336,8 +310,97 @@ describe('Quadtree2', function(){
 
       it('should refactor recursively', function() {
         this.qt.getQuadrantCount().should.eql(9);
-        this.qt.removeObject(4);
+        this.qt.removeObject(this.o4);
         this.qt.getQuadrantCount().should.eql(1);
+      });
+    });
+  });
+
+  describe('#data_.root_', function(){
+    context('when adding items', function() {
+      it('should not change', function() {
+        var qt = qtFactory(),
+            id,
+            i;
+
+        qt.debug(true);
+
+        id = qt.data_.root_.id_;
+
+        for (i = 0; i < 50; i++) {
+          qt.addObject(oFactory());
+        }
+
+        qt.data_.root_.id_.should.eql(id);
+      });
+    });
+  });
+
+  describe('#getPossibleCollisionsForObject', function(){
+    context('with non-colliding objects', function() {
+      it('should return an empty object', function() {
+        var qt = qtFactory(new Vec2(100, 100), 2),
+            o1 = oFactory(1, new Vec2(20,20), 5),
+            o2 = oFactory(2, new Vec2(42,52), 5),
+            o3 = oFactory(3, new Vec2(10,11), 2),
+            o4 = oFactory(4, new Vec2(50,52), 30),
+            o5 = oFactory(5, new Vec2(62,62), 5),
+            o6 = oFactory(6, new Vec2(62,82), 5),
+            o7 = oFactory(7, new Vec2(22,22), 5);
+
+        qt.addObjects([o1, o2, o3, o4, o5, o6, o7]);
+
+        qt.getPossibleCollisionsForObject(o1).should.eql({ 4 : o4, 7 : o7 });
+      });
+    });
+
+    context('with some colliding objects', function() {
+      it('should return the two objects in the correct order', function() {
+        var qt = qtFactory(new Vec2(100, 100), 2),
+            o1 = oFactory(3, new Vec2(20,20), 5),
+            o2 = oFactory(2, new Vec2(22,22), 5),
+            o3 = oFactory(4, new Vec2(60,60), 2);
+
+
+        qt.debug(true);
+        qt.addObjects([o1, o2, o3]);
+        (qt.data_.quadrants_[2][qt.data_.root_.id_] === undefined).should.eql(true);
+
+        qt.getPossibleCollisionsForObject(o1).should.eql({ 2 : o2 });
+      });
+    });
+  });
+
+  describe('#getCollisionsForObject', function(){
+    context('with non-colliding objects', function() {
+      it('should return an empty object', function() {
+        var qt = qtFactory(),
+            o1 = oFactory(1, new Vec2(20,20), 5),
+            o2 = oFactory(2, new Vec2(42,52), 5);
+
+        qt.addObjects([o1, o2]);
+
+        qt.getCollisionsForObject(o1).should.eql({});
+      });
+    });
+
+    context('with some colliding objects', function() {
+      it('should return the two objects in the correct order', function() {
+        var qt = qtFactory(new Vec2(100, 100), 2),
+            o1 = oFactory(1, new Vec2(20,20), 5),
+            o2 = oFactory(2, new Vec2(42,52), 5),
+            o3 = oFactory(3, new Vec2(10,11), 2),
+            o4 = oFactory(4, new Vec2(50,52), 30),
+            o5 = oFactory(5, new Vec2(62,62), 5),
+            o6 = oFactory(6, new Vec2(62,82), 5),
+            o7 = oFactory(7, new Vec2(22,22), 5);
+            o8 = oFactory(8, new Vec2(80,80), 200);
+
+        qt.debug(true);
+
+        qt.addObjects([o1, o2, o3, o4, o5, o6, o7, o8]);
+
+        qt.getCollisionsForObject(o1).should.eql({ 7 : o7, 8 : o8 });
       });
     });
   });

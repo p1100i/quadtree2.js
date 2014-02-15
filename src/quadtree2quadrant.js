@@ -13,6 +13,7 @@ var Quadtree2Quadrant = function Quadtree2Quadrant(leftTop, size, id, parent) {
 Quadtree2Quadrant.prototype = {
   setSize : function setSize(size) {
     if(!size) { return; }
+
     this.size_        = size;
     this.rad_         = size.multiply(0.5, true);
     this.center_      = this.leftTop_.add(this.rad_, true);
@@ -29,17 +30,17 @@ Quadtree2Quadrant.prototype = {
     this.topMid_.y    = this.leftTop_.y;
   },
 
-  makeChildren : function makeChildren() {
+  makeChildren : function makeChildren(id) {
     if (this.children_.length > 0) { return false; }
 
     this.children_.push(
-      new Quadtree2Quadrant(this.leftTop_,  this.rad_, ++this.id_, this),
-      new Quadtree2Quadrant(this.topMid_,   this.rad_, ++this.id_, this),
-      new Quadtree2Quadrant(this.leftMid_,  this.rad_, ++this.id_, this),
-      new Quadtree2Quadrant(this.center_,   this.rad_, ++this.id_, this)
+      new Quadtree2Quadrant(this.leftTop_,  this.rad_, id++, this),
+      new Quadtree2Quadrant(this.topMid_,   this.rad_, id++, this),
+      new Quadtree2Quadrant(this.leftMid_,  this.rad_, id++, this),
+      new Quadtree2Quadrant(this.center_,   this.rad_, id++, this)
     );
 
-    return true;
+    return id;
   },
 
   looseChildren : function looseChildren() {
@@ -135,22 +136,28 @@ Quadtree2Quadrant.prototype = {
     return result;
   },
 
-  getObjects : function getObjects(recursive, result) {
+  getObjects : function getObjects(result, dir) {
     var id;
 
-    if (!result) result = {};
+    if (result.quadrants[this.id_]) { return; }
+
+    result.quadrants[this.id_] = this.id_;
 
     for (id in this.objects_) {
-      result[id] = this.objects_[id];
+      if (result.objects[id]) { return; }
+
+      result.objects[id] = this.objects_[id];
     }
 
-    if (recursive) {
+    if (!dir || dir === 1) {
+      if (this.parent_) { this.parent_.getObjects(result, 1) }
+    } 
+
+    if (!dir || dir === -1) {
       this.children_.forEach(function(child) {
-        child.getObjects(recursive, result);
+        child.getObjects(result, -1);
       });
     }
-
-    return result;
   }
 };
 
