@@ -14,7 +14,7 @@
     "node": ">= 0.6.0"
   },
   "scripts"     : {
-    "test"       : "mocha test/test.js",
+    "test"       : "mocha test/*.js",
     "test-watch" : "grunt watch",
     "build"      : "grunt"
   },
