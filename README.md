@@ -1,6 +1,8 @@
 # Quadtree2.js
 is a Node.js package / JavaScript implementation of two dimensional quadtree for collision detection.
 
+[![Build Status][travis-img-src]][travis-a-href]
+
 ## About
 A quadtree is a scaling data structure for collision detection. You can find theory on the [WIKI][wiki]. I've exported the project for client side use with the help of [browserify][browserify]. Issues/PRs are welcome, please follow [git flow][gitflow] branching model.
 
@@ -82,8 +84,10 @@ bobsDeadlyCollisions = quadtree.getCollisionsForObject(bob);
 [MIT License][git-LICENSE]
 
   [git-LICENSE]: LICENSE
-  [browser-test]: test/browser/index.html
-  [minified]: quadtree2.min.js
+  [travis-img-src]: https://travis-ci.org/burninggramma/quadtree2.js.png?branch=master
+  [travis-a-href]: https://travis-ci.org/burninggramma/quadtree2.js
+  [browser-test]: https://github.com/burninggramma/quadtree2.js/blob/master/test/browser/index.html
+  [minified]: https://github.com/burninggramma/quadtree2.js/blob/master/quadtree2.min.js
   [wiki]: http://en.wikipedia.org/wiki/Quadtree
   [browserify]: http://browserify.org/
   [gitflow]: https://github.com/nvie/gitflow
