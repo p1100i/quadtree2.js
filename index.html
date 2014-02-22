@@ -7,10 +7,26 @@
     <script src="index/pixi.js"></script>
     <script src="index/index.js"></script>
     <style>
+      div#app-container {
+        display : inline-block;
+        top     : 50%;
+        left    : 50%;
+        width   : 800px;
+        height  : 600px;
+        padding : 40px;
+        position    : fixed;
+        margin-left : -420px;
+        margin-top  : -400px;
+        background-image: url('index/back.png');
+        -moz-box-shadow:    inset 0 0 10px #fff;
+        -webkit-box-shadow: inset 0 0 10px #fff;
+        box-shadow:         inset 0 0 10px #fff;
+      }
+      
       ul {
         display : inline-block;
         width   : 200px;
-      } 
+      }
 
       li {
         margin-top      : 5px;
@@ -39,29 +55,27 @@
     </style>
   </head>
   <body>
-    <div id='app'>
-      <div id='app-graphics_'></div>
-      <ul>
-        <li>
-          <span>Quadrants: </span>
-          <span id='app-quadCount_'></span>
-        </li>
-        <li>
-          <span>Objects: </span>
-          <span id='app-objCount_'></span>
-        </li>
-        <li id='app-autoAdd'>
-          <span>Auto add:</span>
-          <span id='app-autoAdd_'></span>
-        </li>
-        <li id='app-autoMove'>
-          <span>Auto move:</span>
-          <span id='app-autoMove_'></span>
-        </li>
-        <li id='app-movedObj'>
-          <span>Moved obj:</span>
-          <span id='app-movedObj_'></span>
-        </li>
+    <div id='app-container'>
+      <div id='app'>
+        <div id='app-graphics_'></div>
+        <ul>
+          <li>
+            <span>Quadrants: </span>
+            <span id='app-quadCount_'></span>
+          </li>
+          <li>
+            <span>Objects: </span>
+            <span id='app-objCount_'></span>
+          </li>
+          <li id='app-autoAdd'>
+            <span>Auto add:</span>
+            <span id='app-autoAdd_'></span>
+          </li>
+          <li id='app-mouseAction'>
+            <span>Click action:</span>
+            <span id='app-mouseAction_'></span>
+          </li>
+      </div>
     </div>
   </body>
 </html>

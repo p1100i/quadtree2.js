@@ -3,6 +3,9 @@ is a Node.js package / JavaScript implementation of two dimensional quadtree for
 
 [![Build Status][travis-img-src]][travis-a-href]
 
+## Try it!
+Visit the projects [GitHub IO Page][github-io] and play around.
+
 ## About
 A quadtree is a scaling data structure for collision detection. You can find theory on the [WIKI][wiki]. I've exported the project for client side use with the help of [browserify][browserify]. Issues/PRs are welcome, please follow [git flow][gitflow] branching model.
 
@@ -91,3 +94,4 @@ bobsDeadlyCollisions = quadtree.getCollisionsForObject(bob);
   [wiki]: http://en.wikipedia.org/wiki/Quadtree
   [browserify]: http://browserify.org/
   [gitflow]: https://github.com/nvie/gitflow
+  [git-io]: http://burninggramma.github.io/quadtree2.js

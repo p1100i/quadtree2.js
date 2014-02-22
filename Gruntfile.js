@@ -23,7 +23,7 @@ module.exports = function(grunt) {
         quotmark: 'single'
       },
       dev: ['Gruntfile.js', 'test/*.js'],
-      app:  ['src/quadtree2.js']
+      app:  ['src/*.js', 'index/index.js']
     },
 
     browserify: {
@@ -66,7 +66,7 @@ module.exports = function(grunt) {
 
     watch : {
       scripts : {
-        files : ['test/*.js', 'src/*.js'],
+        files : ['test/*.js', 'src/*.js', 'index/index.js'],
         tasks : ['test']
       }
     }
