@@ -94,4 +94,4 @@ bobsDeadlyCollisions = quadtree.getCollisionsForObject(bob);
   [wiki]: http://en.wikipedia.org/wiki/Quadtree
   [browserify]: http://browserify.org/
   [gitflow]: https://github.com/nvie/gitflow
-  [git-io]: http://burninggramma.github.io/quadtree2.js
+  [github-io]: http://burninggramma.github.io/quadtree2.js
