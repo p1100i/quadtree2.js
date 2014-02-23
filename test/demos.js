@@ -80,7 +80,35 @@ describe('Quadtree2', function(){
 
       qt.debug(true);
 
-      qt.getPossibleCollisionsForObject(o6).should.eql({ 1 : o1, 2 : o2, 3 : o3, 7 : o7, 8 : o8 });
+      qt.getPossibleCollisionsForObject(o6).should.eql({ 1 : o1, 2 : o2, 3 : o3, 4 : o4, 5 : o5, 7 : o7, 8 : o8 });
+    });
+  });
+
+  context('with object in the middle', function() {
+    it('should refactor itself', function() {
+      var qt = new Quadtree2(new Vec2(500, 500), 4);
+      var o1 = { pos_ : new Vec2(106, 80.5), rad_ : 7 };
+      qt.addObject(o1);
+      var o2 = { pos_ : new Vec2(345, 86.5), rad_ : 6 };
+      qt.addObject(o2);
+      var o3 = { pos_ : new Vec2(102, 473.5), rad_ : 2 };
+      qt.addObject(o3);
+      var o4 = { pos_ : new Vec2(397, 473.5), rad_ : 11 };
+      qt.addObject(o4);
+      var o5 = { pos_ : new Vec2(425, 441.5), rad_ : 15 };
+      qt.addObject(o5);
+      var o6 = { pos_ : new Vec2(250, 251.5), rad_ : 20 };
+      qt.addObject(o6);
+      qt.debug(true);
+      var o7 = { pos_ : new Vec2(274, 343.5), rad_ : 6 };
+      qt.addObject(o7);
+      var o8 = { pos_ : new Vec2(326, 340.5), rad_ : 17 };
+      qt.addObject(o8);
+      var o9 = { pos_ : new Vec2(338, 301.5), rad_ : 20 };
+      qt.addObject(o9);
+
+      qt.getPossibleCollisionsForObject(o6).should.eql({ 1 : o1, 2 : o2, 3 : o3, 7 : o7, 8 : o8, 9 : o9 });
     });
   });
 });
+
