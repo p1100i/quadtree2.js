@@ -264,6 +264,21 @@ describe('Quadtree2', function(){
         this.qt.getQuadrantCount().should.eql(5);
       });
     });
+
+    context('with moving object out of the quadtree', function() {
+      it('should have no quadrants', function() {
+        var o3 = oFactory(null, new Vec2(60, 4), 2);
+
+        this.qt.addObject(o3);
+        this.qt.getQuadrantCount().should.eql(5);
+
+        o3.pos_.x = -40;
+        o3.pos_.y = -40;
+
+        this.qt.updateObject(o3);
+        this.qt.getQuadrantCount().should.eql(1);
+      });
+    });
   });
 
   describe('#removeObject', function(){
@@ -334,7 +349,7 @@ describe('Quadtree2', function(){
 
         qt.addObjects([o1, o2, o3, o4, o5, o6, o7]);
 
-        qt.getPossibleCollisionsForObject(o1).should.eql({ 7 : o7 });
+        qt.getPossibleCollisionsForObject(o1).should.eql({ 3 : o3, 4 : o4, 7 : o7 });
       });
     });
 

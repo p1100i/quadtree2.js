@@ -1,3 +1,6 @@
+- 0.4.1
+    - improves object storing logic
+
 - 0.4.0
     - adds #getObjects to list added objects
     - minor tweek with default quadrant levels

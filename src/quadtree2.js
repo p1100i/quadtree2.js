@@ -71,38 +71,79 @@ Quadtree2 = function Quadtree2(size, quadrantObjectsLimit, quadrantLevelLimit) {
           return objA[k.r] + objB[k.r] > objA[k.p].distance(objB[k.p]);
         },
 
-        getSmallestIntersectingQuadrants : function getSmallestIntersectingQuadrants(obj, quadrant, result) {
+        removeQuadrantParentQuadrants : function removeQuadrantParentQuadrants(quadrant, quadrants) {
+          if (!quadrant.parent_) { return; }
+
+          if (quadrants[quadrant.parent_.id_]) {
+            delete quadrants[quadrant.parent_.id_];
+            fns.removeQuadrantParentQuadrants(quadrant.parent_, quadrants);
+          }
+        },
+
+        getSubtreeTopQuadrant : function getSubtreeTopQuadrant(quadrant, quadrants) {
+          if (!quadrant.parent_ || !quadrants[quadrant.parent_.id_]) { return quadrant; }
+          return getSubtreeTopQuadrant(quadrant.parent_, quadrants);
+        },
+
+        removeQuadrantChildtree : function removeQuadrantChildtree(quadrant, quadrants) {
           var i,
-              id,
-              children;
+              children = quadrant.getChildren();
 
-          if (!quadrant)  { quadrant = data.root_; }
-          if (!result)    { result = {}; }
+          for (i = 0; i < children.length; i++) {
+            if (!quadrants[children[i].id_]) { return; }
+            delete quadrants[children[i].id_];
+            fns.removeQuadrantChildtree(children[i], quadrants);
+          }
+        },
 
-          if (!quadrant.intersects(obj[k.p], obj[k.r])) { return; }
+        getIntersectingQuadrants: function getIntersectingQuadrants(obj, quadrant, result) {
+           var i,
+               children;
 
-          children = quadrant.getChildren();
+          if (!quadrant.intersects(obj[k.p], obj[k.r])) {
+            fns.removeQuadrantParentQuadrants(quadrant, result.biggest);
+            return;
+          }
+
+          result.biggest[quadrant.id_] = quadrant;
+          children                     = quadrant.getChildren();
 
           if (children.length) {
             for (i = 0; i < children.length; i++) {
-              getSmallestIntersectingQuadrants(obj, children[i], result);
+              getIntersectingQuadrants(obj, children[i], result);
             }
           } else {
-            result[quadrant.id_] = quadrant;
+            result.leaves[quadrant.id_] = quadrant;
+          }
+        },
+
+        getSmallestIntersectingQuadrants : function getSmallestIntersectingQuadrants(obj, quadrant, result) {
+          var id,
+              top;
+
+          if (!quadrant)  { quadrant = data.root_; }
+          if (!result)    { result = { leaves : {}, biggest : {} }; }
+
+          fns.getIntersectingQuadrants(obj, quadrant, result);
+
+          for (id in result.leaves) {
+            if (!result.biggest[id]) { continue; }
+            top = fns.getSubtreeTopQuadrant(result.leaves[id], result.biggest);
+            fns.removeQuadrantChildtree(top, result.biggest);
           }
 
-          return result;
+          return result.biggest;
         },
 
         removeQuadrantObjects : function removeQuadrantObjects(quadrant) {
-          var id;
-              result = quadrant.removeObjects();
+          var i,
+              removed = quadrant.removeObjects([], 1);
 
-          for (id in result) {
-            delete data.quadrants_[id][quadrant.id_];
+          for (i = 0; i < removed.length; i++) {
+            delete data.quadrants_[removed[i].obj[k.id]][removed[i].quadrant.id_];
           }
 
-          return result;
+          return removed;
         },
 
         removeObjectFromQuadrants : function removeObjectFromQuadrants(obj, quadrants) {
@@ -194,11 +235,12 @@ Quadtree2 = function Quadtree2(size, quadrantObjectsLimit, quadrantLevelLimit) {
         },
 
         populateSubtree : function populateSubtree(obj, quadrant) {
-          var id,
+          var i,
+              id,
               addBySubtree,
               smallestQs,
               intersectingChildren,
-              objs;
+              removed;
 
           if (!quadrant) { quadrant = data.root_; }
 
@@ -225,12 +267,14 @@ Quadtree2 = function Quadtree2(size, quadrantObjectsLimit, quadrantLevelLimit) {
             // Got no place so lets make children.
             quadrant.makeChildren(fns.nextQuadrantId());
 
-            // Remove all the stored objects.
-            objs = fns.removeQuadrantObjects(quadrant);
-            objs[obj[k.id]] = obj;
+            // Remove all the stored objects until the parent.
+            removed = fns.removeQuadrantObjects(quadrant);
+            removed.push({ obj : obj, quadrant : quadrant });
 
             // Recalculate all objects which were stored before.
-            for (id in objs) { fns.populateSubtree(objs[id], quadrant); }
+            for (i = 0; i < removed.length; i++) {
+              fns.populateSubtree(removed[i].obj, removed[i].quadrant);
+            }
           }
         },
 

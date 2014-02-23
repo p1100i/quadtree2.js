@@ -1,6 +1,6 @@
 /**
  * @license
- * quadtree2 - v0.4.0
+ * quadtree2 - v0.4.1
  * Copyright (c) 2013-2014 burninggramma
  * https://github.com/burninggramma/quadtree2.js
  *
@@ -218,18 +218,37 @@
                 hasCollision: function(a, b) {
                     return a[k.r] + b[k.r] > a[k.p].distance(b[k.p]);
                 },
-                getSmallestIntersectingQuadrants: function p(a, b, c) {
-                    var d, e;
-                    if (b || (b = i.root_), c || (c = {}), b.intersects(a[k.p], a[k.r])) {
-                        if (e = b.getChildren(), e.length) for (d = 0; d < e.length; d++) p(a, e[d], c); else c[b.id_] = b;
-                        return c;
+                removeQuadrantParentQuadrants: function(a, b) {
+                    a.parent_ && b[a.parent_.id_] && (delete b[a.parent_.id_], m.removeQuadrantParentQuadrants(a.parent_, b));
+                },
+                getSubtreeTopQuadrant: function p(a, b) {
+                    return a.parent_ && b[a.parent_.id_] ? p(a.parent_, b) : a;
+                },
+                removeQuadrantChildtree: function(a, b) {
+                    var c, d = a.getChildren();
+                    for (c = 0; c < d.length; c++) {
+                        if (!b[d[c].id_]) return;
+                        delete b[d[c].id_], m.removeQuadrantChildtree(d[c], b);
                     }
                 },
+                getIntersectingQuadrants: function q(a, b, c) {
+                    var d, e;
+                    if (!b.intersects(a[k.p], a[k.r])) return void m.removeQuadrantParentQuadrants(b, c.biggest);
+                    if (c.biggest[b.id_] = b, e = b.getChildren(), e.length) for (d = 0; d < e.length; d++) q(a, e[d], c); else c.leaves[b.id_] = b;
+                },
+                getSmallestIntersectingQuadrants: function(a, b, c) {
+                    var d, e;
+                    b || (b = i.root_), c || (c = {
+                        leaves: {},
+                        biggest: {}
+                    }), m.getIntersectingQuadrants(a, b, c);
+                    for (d in c.leaves) c.biggest[d] && (e = m.getSubtreeTopQuadrant(c.leaves[d], c.biggest), m.removeQuadrantChildtree(e, c.biggest));
+                    return c.biggest;
+                },
                 removeQuadrantObjects: function(a) {
-                    var b;
-                    result = a.removeObjects();
-                    for (b in result) delete i.quadrants_[b][a.id_];
-                    return result;
+                    var b, c = a.removeObjects([], 1);
+                    for (b = 0; b < c.length; b++) delete i.quadrants_[c[b].obj[k.id]][c[b].quadrant.id_];
+                    return c;
                 },
                 removeObjectFromQuadrants: function(a, b) {
                     var c;
@@ -262,17 +281,18 @@
                     void 0 === i.quadrants_[c] && (i.quadrants_[c] = {}), i.quadrants_[c][b.id_] = b, b.addObject(c, a);
                 },
                 populateSubtree: function(a, b) {
-                    var c, d, e;
+                    var c, d, e, f;
                     if (b || (b = i.root_), b.hasChildren()) {
-                        d = m.getSmallestIntersectingQuadrants(a, b);
-                        for (c in d) {
-                            if (d[c] === b) return void m.addObjectToQuadrant(a, b);
-                            m.populateSubtree(a, d[c]);
+                        e = m.getSmallestIntersectingQuadrants(a, b);
+                        for (d in e) {
+                            if (e[d] === b) return void m.addObjectToQuadrant(a, b);
+                            m.populateSubtree(a, e[d]);
                         }
-                    } else if (b.getObjectCount() < i.quadrantObjectsLimit_ || b.size_.x < i.quadrantSizeLimit_.x) m.addObjectToQuadrant(a, b); else {
-                        b.makeChildren(m.nextQuadrantId()), e = m.removeQuadrantObjects(b), e[a[k.id]] = a;
-                        for (c in e) m.populateSubtree(e[c], b);
-                    }
+                    } else if (b.getObjectCount() < i.quadrantObjectsLimit_ || b.size_.x < i.quadrantSizeLimit_.x) m.addObjectToQuadrant(a, b); else for (b.makeChildren(m.nextQuadrantId()), 
+                    f = m.removeQuadrantObjects(b), f.push({
+                        obj: a,
+                        quadrant: b
+                    }), c = 0; c < f.length; c++) m.populateSubtree(f[c].obj, f[c].quadrant);
                 },
                 init: function() {
                     var a;
@@ -449,9 +469,16 @@
             addObject: function(a, b) {
                 this.objectCount_++, this.objects_[a] = b;
             },
-            removeObjects: function() {
-                var a = this.objects_;
-                return this.objects_ = {}, this.objectCount_ = 0, a;
+            removeObjects: function(a, b) {
+                var c;
+                a || (a = []);
+                for (c in this.objects_) a.push({
+                    obj: this.objects_[c],
+                    quadrant: this
+                }), delete this.objects_[c];
+                return this.objectCount_ = 0, b && 1 !== b || this.parent_ && this.parent_.removeObjects(a, 1), b && -1 !== b || this.children_.forEach(function(b) {
+                    b.removeObjects(a, -1);
+                }), a;
             },
             removeObject: function(a) {
                 var b = this.objects_[a];
@@ -487,11 +514,14 @@
                     c.getChildren(a, b);
                 }), b;
             },
-            getObjects: function(a) {
-                var b;
+            getObjects: function(a, b) {
+                var c;
                 if (!a.quadrants[this.id_]) {
                     a.quadrants[this.id_] = this.id_;
-                    for (b in this.objects_) a.objects[b] || (a.objects[b] = this.objects_[b]);
+                    for (c in this.objects_) a.objects[c] || (a.objects[c] = this.objects_[c]);
+                    b && 1 !== b || this.parent_ && this.parent_.getObjects(a, 1), b && -1 !== b || this.children_.forEach(function(b) {
+                        b.getObjects(a, -1);
+                    });
                 }
             }
         }, b.exports = c;

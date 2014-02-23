@@ -60,11 +60,29 @@ Quadtree2Quadrant.prototype = {
     this.objects_[id] = obj;
   },
 
-  removeObjects : function removeObjects() {
-    var result = this.objects_;
-    this.objects_ = {};
+  removeObjects : function removeObjects(removed, dir) {
+    var id;
+
+    if (!removed) { removed = []; }
+
+    for (id in this.objects_) {
+      removed.push({ obj : this.objects_[id], quadrant : this });
+      delete this.objects_[id];
+    }
+
     this.objectCount_ = 0;
-    return result;
+
+    if (!dir || dir === 1) {
+      if (this.parent_) { this.parent_.removeObjects(removed, 1); }
+    }
+
+    if (!dir || dir === -1) {
+      this.children_.forEach(function(child) {
+        child.removeObjects(removed, -1);
+      });
+    }
+
+    return removed;
   },
 
   removeObject : function removeObject(id) {
@@ -147,6 +165,16 @@ Quadtree2Quadrant.prototype = {
       if (result.objects[id]) { continue; }
 
       result.objects[id] = this.objects_[id];
+    }
+
+    if (!dir || dir === 1) {
+      if (this.parent_) { this.parent_.getObjects(result, 1); }
+    }
+
+    if (!dir || dir === -1) {
+      this.children_.forEach(function(child) {
+        child.getObjects(result, -1);
+      });
     }
   }
 };
