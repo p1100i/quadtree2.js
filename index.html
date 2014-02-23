@@ -1,0 +1,131 @@
+<html>
+  <head>
+    <title>Quadtree2.js Tests</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <script src="quadtree2.min.js"></script>
+    <script src="index/vec2.js"></script>
+    <script src="index/pixi.js"></script>
+    <script src="index/index.js"></script>
+    <style>
+      div#app-container {
+        display     : inline-block;
+        top         : 50%;
+        left        : 50%;
+        width       : 800px;
+        min-height  : 600px;
+        padding     : 40px;
+        position    : absolute;
+        margin-left : -420px;
+        margin-top  : -400px;
+        background-image: url('index/back.png');
+        -moz-box-shadow:    inset 0 0 10px #fff;
+        -webkit-box-shadow: inset 0 0 10px #fff;
+        box-shadow:         inset 0 0 10px #fff;
+      }
+
+      div#app {
+        display : block;
+        height  : 500px;
+      }
+
+      div#app-log {
+        margin-top          : 20px;
+        color               : white;
+        padding             : 15px;
+        background-color    : #212121;
+        -moz-box-shadow     : 6px 6px 5px 2px #000;
+        -webkit-box-shadow  : 6px 6px 5px 2px #000;
+        box-shadow          : 6px 6px 5px 2px #000;
+      }
+      
+      .hidden {
+        display: none;
+      }
+      
+      ul {
+        display : inline-block;
+        width   : 250px;
+      }
+
+      li {
+        margin-top      : 10px;
+        padding         : 10px 10px 0 10px;
+        height          : 30px;
+        border          : 1px solid black;
+        list-style-type : none;
+        background-color: #d9d9d9;
+        -moz-box-shadow     : 6px 6px 5px 2px #000;
+        -webkit-box-shadow  : 6px 6px 5px 2px #000;
+        box-shadow          : 6px 6px 5px 2px #000;
+      }
+
+      li.place {
+        margin-top : 40px;
+      }
+
+      li.action {
+        cursor          : pointer;
+        background-color: #51b12f;
+      }
+
+      li.action:hover {
+        background-color: #f1b12f;
+        border-color: white;
+        -moz-box-shadow     : 6px 6px 5px 2px #222;
+        -webkit-box-shadow  : 6px 6px 5px 2px #222;
+        box-shadow          : 6px 6px 5px 2px #222;
+      }
+
+      li span[id] {
+        color: green;
+        float: right;
+      }
+
+      li.action span[id] {
+        color : white;
+      }
+
+      div#app-graphics_ {
+        display : inline-block;
+        height  : 500px;
+        float   : left;
+        -moz-box-shadow     : 6px 6px 5px 2px #000;
+        -webkit-box-shadow  : 6px 6px 5px 2px #000;
+        box-shadow          : 6px 6px 5px 2px #000;
+      }
+    </style>
+  </head>
+  <body>
+    <div id='app-container'>
+      <div id='app'>
+        <div id='app-graphics_'></div>
+        <ul>
+          <li id='app-closestId'>
+            <span>Closest element id:</span>
+            <span id='app-closestId_'></span>
+          </li>
+          <li>
+            <span>Quadrants: </span>
+            <span id='app-quadCount_'></span>
+          </li>
+          <li>
+            <span>Objects: </span>
+            <span id='app-objCount_'></span>
+          </li>
+          <li id='app-autoAdd' class='action place'>
+            <span>Auto add:</span>
+            <span id='app-autoAdd_'></span>
+          </li>
+          <li id='app-mouseAction' class='action'>
+            <span>Click action:</span>
+            <span id='app-mouseAction_'></span>
+          </li>
+          <li id='app-logInfo' class='action'>
+            <span>Log length:</span>
+            <span id='app-logInfo_'></span>
+          </li>
+      </div>
+      <div id='app-log'></div>
+    </div>
+  </body>
+</html>
