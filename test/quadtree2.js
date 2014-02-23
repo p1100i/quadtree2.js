@@ -58,8 +58,8 @@ describe('Quadtree2', function(){
         Quadtree2.bind(null, 1,2).should.throw(/^NaV_size_/);
       });
 
-      it('should throw NaN_limit_', function(){
-        Quadtree2.bind(null, new Vec2(2,3), null).should.throw(/^NaN_limit_/);
+      it('should throw NaN_quadrantObjectsLimit_', function(){
+        Quadtree2.bind(null, new Vec2(2,3), null).should.throw(/^NaN_quadrantObjectsLimit_/);
       });
     });
 
@@ -167,16 +167,12 @@ describe('Quadtree2', function(){
 
   describe('#getQuadrantCount', function(){
     context('with some objects', function() {
-      it('should behave correctly', function() {
-        var qt = qtFactory(new Vec2(100, 100), 1),
+      it('should behave correctly - 1', function() {
+        var qt = qtFactory(new Vec2(100, 100), 1, 3),
             o1 = oFactory(null, new Vec2(2,2), 1),
             o2 = oFactory(null, new Vec2(98,98), 1),
             o3 = oFactory(null, new Vec2(52,2), 1),
             o4 = oFactory(null, new Vec2(70,3), 1),
-            o5 = oFactory(null, new Vec2(50,50), 100),
-            o6 = oFactory(null, new Vec2(50,50), 20),
-            o7 = oFactory(null, new Vec2(2, 95), 1),
-            o8 = oFactory(null, new Vec2(45,95), 1),
 
             checkSingleQss = function(qss, qssLength, leftTop, size) {
               Object.keys(qss).length.should.eql(qssLength);
@@ -194,24 +190,6 @@ describe('Quadtree2', function(){
         qt.addObjects([o3, o4]);
         qt.getQuadrantCount().should.eql(13);
         checkSingleQss(qt.getSmallestIntersectingQuadrants(o3), 1, new Vec2(50, 0), new Vec2(6.25, 6.25));
-
-        qt.addObject(o5);
-        qt.getQuadrantCount().should.eql(13);
-        checkSingleQss(qt.getSmallestIntersectingQuadrants(o5), 1, new Vec2(0, 0), new Vec2(100,100));
-
-
-        qt.addObject(o6);
-        qt.getQuadrantCount().should.eql(21);
-        checkSingleQss(qt.getSmallestIntersectingQuadrants(o6), 4);
-
-        qt.addObject(o7);
-        qt.getQuadrantCount().should.eql(25);
-        checkSingleQss(qt.getSmallestIntersectingQuadrants(o7), 1,new Vec2(0, 75), new Vec2(25,25));
-
-
-        qt.addObject(o8);
-        qt.getQuadrantCount().should.eql(25);
-        checkSingleQss(qt.getSmallestIntersectingQuadrants(o8), 1,new Vec2(25, 75), new Vec2(25,25));
       });
 
       it('should behave correctly', function() {
@@ -356,7 +334,7 @@ describe('Quadtree2', function(){
 
         qt.addObjects([o1, o2, o3, o4, o5, o6, o7]);
 
-        qt.getPossibleCollisionsForObject(o1).should.eql({ 3 : o3, 7 : o7 });
+        qt.getPossibleCollisionsForObject(o1).should.eql({ 7 : o7 });
       });
     });
 
@@ -400,11 +378,10 @@ describe('Quadtree2', function(){
             o5 = oFactory(5, new Vec2(62,62), 5),
             o6 = oFactory(6, new Vec2(62,82), 5),
             o7 = oFactory(7, new Vec2(22,22), 5);
-            o8 = oFactory(8, new Vec2(80,80), 200);
 
-        qt.addObjects([o1, o2, o3, o4, o5, o6, o7, o8]);
+        qt.addObjects([o1, o2, o3, o4, o5, o6, o7]);
 
-        qt.getCollisionsForObject(o1).should.eql({ 7 : o7, 8 : o8 });
+        qt.getCollisionsForObject(o1).should.eql({ 7 : o7 });
       });
     });
   });

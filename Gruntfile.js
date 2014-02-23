@@ -78,7 +78,16 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-simple-mocha');
 
-  grunt.registerTask('test',    ['jshint', 'simplemocha']);
+  grunt.registerTask('test', [
+    'jshint',
+    'simplemocha'
+  ]);
+  grunt.registerTask('build', [
+    'browserify',
+    'uglify:browserified',
+    'uglify:build'
+  ]);
+
   grunt.registerTask('default', [
     'jshint',
     'simplemocha',

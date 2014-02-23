@@ -4,7 +4,7 @@ var Vec2                = require('vec2'),
     Quadtree2Quadrant   = require('./quadtree2quadrant'),
     Quadtree2;
 
-Quadtree2 = function Quadtree2(size, limit, idKey) {
+Quadtree2 = function Quadtree2(size, quadrantObjectsLimit, quadrantLevelLimit) {
   var id,
 
       // Container for private data.
@@ -15,9 +15,11 @@ Quadtree2 = function Quadtree2(size, limit, idKey) {
         quadrantIds_ : 1,
         autoId_      : true,
         inited_      : false,
-        limit_       : undefined,
         size_        : undefined,
-        root_        : undefined
+        root_        : undefined,
+        quadrantObjectsLimit_ : undefined,
+        quadrantLevelLimit_   : undefined,
+        quadrantSizeLimit_    : undefined
       },
 
       validator = new Quadtree2Validator(),
@@ -33,8 +35,9 @@ Quadtree2 = function Quadtree2(size, limit, idKey) {
       constraints = {
         data : {
           necessary : {
-            size_  : validator.isVec2,
-            limit_ : validator.isNumber
+            size_                 : validator.isVec2,
+            quadrantObjectsLimit_ : validator.isNumber,
+            quadrantLevelLimit_   : validator.isNumber
           }
         },
 
@@ -68,68 +71,27 @@ Quadtree2 = function Quadtree2(size, limit, idKey) {
           return objA[k.r] + objB[k.r] > objA[k.p].distance(objB[k.p]);
         },
 
-        removeQuadrantParentQuadrants : function removeQuadrantParentQuadrants(quadrant, quadrants) {
-          if (!quadrant.parent_) { return; }
-
-          if (quadrants[quadrant.parent_.id_]) {
-            delete quadrants[quadrant.parent_.id_];
-            fns.removeQuadrantParentQuadrants(quadrant.parent_, quadrants);
-          }
-        },
-
-        getSubtreeTopQuadrant : function getSubtreeTopQuadrant(quadrant, quadrants) {
-          if (!quadrant.parent_ || !quadrants[quadrant.parent_.id_]) { return quadrant; }
-          return getSubtreeTopQuadrant(quadrant.parent_, quadrants);
-        },
-
-        removeQuadrantChildtree : function removeQuadrantChildtree(quadrant, quadrants) {
+        getSmallestIntersectingQuadrants : function getSmallestIntersectingQuadrants(obj, quadrant, result) {
           var i,
-              children = quadrant.getChildren();
-
-          for (i = 0; i < children.length; i++) {
-            if (!quadrants[children[i].id_]) { return; }
-            delete quadrants[children[i].id_];
-            fns.removeQuadrantChildtree(children[i], quadrants);
-          }
-        },
-
-        getIntersectingQuadrants: function getIntersectingQuadrants(obj, quadrant, result) {
-          var i,
+              id,
               children;
 
-          if (!quadrant.intersects(obj[k.p], obj[k.r])) {
-            fns.removeQuadrantParentQuadrants(quadrant, result.biggest);
-            return;
-          }
+          if (!quadrant)  { quadrant = data.root_; }
+          if (!result)    { result = {}; }
 
-          result.biggest[quadrant.id_] = quadrant;
-          children                     = quadrant.getChildren();
+          if (!quadrant.intersects(obj[k.p], obj[k.r])) { return; }
+
+          children = quadrant.getChildren();
 
           if (children.length) {
             for (i = 0; i < children.length; i++) {
-              getIntersectingQuadrants(obj, children[i], result);
+              getSmallestIntersectingQuadrants(obj, children[i], result);
             }
           } else {
-            result.leaves[quadrant.id_] = quadrant;
-          }
-        },
-
-        getSmallestIntersectingQuadrants : function getSmallestIntersectingQuadrants(obj, quadrant, result) {
-          var id,
-              top;
-
-          if (!quadrant)  { quadrant = data.root_; }
-          if (!result)    { result = { leaves : {}, biggest : {} }; }
-
-          fns.getIntersectingQuadrants(obj, quadrant, result);
-
-          for (id in result.leaves) {
-            if (!result.biggest[id]) { continue; }
-            top = fns.getSubtreeTopQuadrant(result.leaves[id], result.biggest);
-            fns.removeQuadrantChildtree(top, result.biggest);
+            result[quadrant.id_] = quadrant;
           }
 
-          return result.biggest;
+          return result;
         },
 
         removeQuadrantObjects : function removeQuadrantObjects(quadrant) {
@@ -181,7 +143,7 @@ Quadtree2 = function Quadtree2(size, limit, idKey) {
 
           count = quadrant.getObjectCount(true, true);
 
-          if (count > data.limit_) { return; }
+          if (count > data.quadrantObjectsLimit_) { return; }
 
           quadrant.refactoring_ = true;
 
@@ -255,7 +217,7 @@ Quadtree2 = function Quadtree2(size, limit, idKey) {
               fns.populateSubtree(obj, smallestQs[id]);
             }
 
-          } else if (quadrant.getObjectCount() < data.limit_) {
+          } else if (quadrant.getObjectCount() < data.quadrantObjectsLimit_ || quadrant.size_.x < data.quadrantSizeLimit_.x ) {
             // Has no children but still got place, so store it.
             fns.addObjectToQuadrant(obj, quadrant);
 
@@ -273,9 +235,16 @@ Quadtree2 = function Quadtree2(size, limit, idKey) {
         },
 
         init : function init() {
+          var divider;
+
+          if (!data.quadrantLevelLimit_) data.quadrantLevelLimit_ = 10;
+
           validator.byCallbackObject(data, constraints.data.necessary);
 
           data.root_ = new Quadtree2Quadrant(new Vec2(0,0), data.size_.clone(), fns.nextQuadrantId(1));
+
+          divider = Math.pow(2, data.quadrantLevelLimit_);
+          data.quadrantSizeLimit_ = data.size_.clone().divide(divider);
 
           data.inited_ = true;
         },
@@ -344,17 +313,30 @@ Quadtree2 = function Quadtree2(size, limit, idKey) {
 
       // Public function definitions
       publicFns = {
-        getLimit : function getLimit() {
-          return data.limit_;
+        getQuadrantObjectsLimit: function getQuadrantObjectsLimit() {
+          return data.quadrantObjectsLimit_;
         },
 
-        setLimit : function setLimit(limit) {
-          if (limit === undefined) { return; }
+        setQuadrantObjectsLimit : function getQuadrantObjectsLimit(quadrantObjectsLimit) {
+          if (quadrantObjectsLimit === undefined) { return; }
 
-          validator.isNumber(limit, 'limit_');
+          validator.isNumber(quadrantObjectsLimit, 'quadrantObjectsLimit_');
 
-          data.limit_ = limit;
+          data.quadrantObjectsLimit_ = quadrantObjectsLimit;
         },
+
+        getQuadrantLevelLimit : function getQuadrantLevelLimit() {
+          return data.quadrantLevelLimit_;
+        },
+
+        setQuadrantLevelLimit: function setQuadrantLevelLimit(quadrantLevelLimit) {
+          if (quadrantLevelLimit === undefined) { return; }
+
+          validator.isNumber(quadrantLevelLimit, 'quadrantLevelLimit_');
+
+          data.quadrantLevelLimit_ = quadrantLevelLimit;
+        },
+
 
         setObjectKey : function setObjectKey(key, val) {
           validator.fnFalse(fns.checkInit);
@@ -484,8 +466,8 @@ Quadtree2 = function Quadtree2(size, limit, idKey) {
   for (id in publicFns) { this[id] = publicFns[id]; }
 
   this.setSize(size);
-  this.setLimit(limit);
-  this.setObjectKey('id', idKey);
+  this.setQuadrantObjectsLimit(quadrantObjectsLimit);
+  this.setQuadrantLevelLimit(quadrantLevelLimit);
 };
 
 module.exports = Quadtree2;
