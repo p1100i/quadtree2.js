@@ -296,8 +296,8 @@ window.onload = function () {
   };
 
   app.start = function start() {
-    app.qt = new Quadtree2(new Vec2(app.w_, app.h_), app.limit_, undefined);
-    app.log('var qt = new Quadtree2(new Vec2(' + app.w_ + ', ' + app.h_ + '), ' + app.limit_ + ', undefined);');
+    app.qt = new Quadtree2(new Vec2(app.w_, app.h_), app.limit_);
+    app.log('var qt = new Quadtree2(new Vec2(' + app.w_ + ', ' + app.h_ + '), ' + app.limit_ + ');');
     app.$graphics_.appendChild(app.renderer.view);
     app.qt.debug(true);
     app.renderer.view.style.display = 'block';
