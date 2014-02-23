@@ -1,3 +1,6 @@
+- 0.4.2
+    - extended API for querying quadrant count of obj
+
 - 0.4.1
     - improves object storing logic
 

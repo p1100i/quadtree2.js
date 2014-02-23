@@ -1,6 +1,6 @@
 /**
  * @license
- * quadtree2 - v0.4.1
+ * quadtree2 - v0.4.2
  * Copyright (c) 2013-2014 burninggramma
  * https://github.com/burninggramma/quadtree2.js
  *
@@ -394,8 +394,8 @@
                     for (a in i.objects_) b[a] = i.objects_[a];
                     return b;
                 },
-                getQuadrantCount: function() {
-                    return 1 + i.root_.getChildCount(!0);
+                getQuadrantCount: function(a) {
+                    return a ? Object.keys(i.quadrants_[a[k.id]]).length : 1 + i.root_.getChildCount(!0);
                 },
                 getQuadrantObjectCount: function() {
                     return i.root_.getObjectCount(!0);
