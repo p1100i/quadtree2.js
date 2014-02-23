@@ -144,19 +144,9 @@ Quadtree2Quadrant.prototype = {
     result.quadrants[this.id_] = this.id_;
 
     for (id in this.objects_) {
-      if (result.objects[id]) { return; }
+      if (result.objects[id]) { continue; }
 
       result.objects[id] = this.objects_[id];
-    }
-
-    if (!dir || dir === 1) {
-      if (this.parent_) { this.parent_.getObjects(result, 1); }
-    } 
-
-    if (!dir || dir === -1) {
-      this.children_.forEach(function(child) {
-        child.getObjects(result, -1);
-      });
     }
   }
 };
