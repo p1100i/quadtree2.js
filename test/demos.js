@@ -6,7 +6,7 @@ var Quadtree2   = require('../src/quadtree2'),
 describe('Quadtree2', function(){
   context('with object in the middle', function() {
     it('should not return all other objects as possible colliding', function(){
-      var qt = new Quadtree2(new Vec2(500, 500), 4, undefined);
+      var qt = new Quadtree2(new Vec2(500, 500), 4);
       var o1 = { pos_ : new Vec2(472, 276), rad_ : 8 };
       qt.addObject(o1);
       var o2 = { pos_ : new Vec2(142, 407), rad_ : 20 };
@@ -26,8 +26,12 @@ describe('Quadtree2', function(){
       var o9 = { pos_ : new Vec2(325, 329), rad_ : 19 };
       qt.addObject(o9);
       var o10 = { pos_ : new Vec2(250, 251), rad_ : 11 };
+
+      qt.debug(true);
       qt.addObject(o10);
 
+      var quadrantIds = Object.keys(qt.data_.quadrants_[o10.id_]);
+      quadrantIds.should.not.containEql('1');
       qt.getPossibleCollisionsForObject(o10).should.eql({ 3 : o3, 4 : o4, 2 : o2, 9 : o9 });
     });
   });
