@@ -1,6 +1,6 @@
 /**
  * @license
- * quadtree2 - v0.3.0
+ * quadtree2 - v0.4.0
  * Copyright (c) 2013-2014 burninggramma
  * https://github.com/burninggramma/quadtree2.js
  *
@@ -276,7 +276,7 @@
                 },
                 init: function() {
                     var a;
-                    i.quadrantLevelLimit_ || (i.quadrantLevelLimit_ = 10), j.byCallbackObject(i, l.data.necessary), i.root_ = new g(new d(0, 0), i.size_.clone(), m.nextQuadrantId(1)), 
+                    i.quadrantLevelLimit_ || (i.quadrantLevelLimit_ = 6), j.byCallbackObject(i, l.data.necessary), i.root_ = new g(new d(0, 0), i.size_.clone(), m.nextQuadrantId(1)), 
                     a = Math.pow(2, i.quadrantLevelLimit_), i.quadrantSizeLimit_ = i.size_.clone().divide(a), i.inited_ = !0;
                 },
                 checkInit: function(a) {
@@ -368,6 +368,11 @@
                 },
                 getCount: function() {
                     return Object.keys(i.objects_).length;
+                },
+                getObjects: function() {
+                    var a, b = {};
+                    for (a in i.objects_) b[a] = i.objects_[a];
+                    return b;
                 },
                 getQuadrantCount: function() {
                     return 1 + i.root_.getChildCount(!0);
