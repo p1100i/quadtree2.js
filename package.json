@@ -6,6 +6,7 @@
   "main"        : "src/quadtree2.js",
   "license"     : "MIT",
   "licenseUrl"  : "http://www.opensource.org/licenses/mit-license.php",
+  "homepage"    : "http://burninggramma.github.io/quadtree2.js",
   "repository"  : {
     "type" : "git",
     "url"  : "https://github.com/burninggramma/quadtree2.js"
