@@ -1,4 +1,7 @@
 - 0.2.0
+    - fixes bug in intersection calculation
+
+- 0.2.0
     - private function signature changed
     - added more test cases
     - fixes smallest quadrant calculation issues
