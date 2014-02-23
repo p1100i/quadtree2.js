@@ -150,7 +150,7 @@ Quadtree2Quadrant.prototype = {
     }
 
     if (!dir || dir === 1) {
-      if (this.parent_) { this.parent_.getObjects(result, 1) }
+      if (this.parent_) { this.parent_.getObjects(result, 1); }
     } 
 
     if (!dir || dir === -1) {

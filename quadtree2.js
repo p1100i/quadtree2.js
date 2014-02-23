@@ -1,10 +1,10 @@
 /**
  * @license
- * quadtree2 - v0.0.1
+ * quadtree2 - v0.1.2
  * Copyright (c) 2013-2014 burninggramma
  * https://github.com/burninggramma/quadtree2.js
  *
- * Compiled: 2014-02-15
+ * Compiled: 2014-02-23
  *
  * quadtree2 is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license.php
@@ -210,15 +210,37 @@
                 },
                 nextQuadrantId: function(a) {
                     var b = i.quadrantIds_;
-                    return i.quadrantIds_ += a || 1, b;
+                    return i.quadrantIds_ += a || 4, b;
                 },
                 hasCollision: function(a, b) {
                     return a[k.r] + b[k.r] > a[k.p].distance(b[k.p]);
                 },
-                getSmallestQuadrants: function(a, b, c, d) {
-                    var e, f;
-                    if (b || (b = i.root_), c || (c = {}), f = b.intersectingChildren(a[k.p], a[k.r]), f.length === b.getChildCount()) (d || b.intersects(a[k.p], a[k.r])) && (c[b.id_] = b); else for (e in f) m.getSmallestQuadrants(a, f[e], c, !0);
-                    return c;
+                removeQuadrantParentQuadrants: function(a, b) {
+                    a.parent_ && b[a.parent_.id_] && (delete b[a.parent_.id_], m.removeQuadrantParentQuadrants(a.parent_, b));
+                },
+                getSubtreeTopQuadrant: function p(a, b) {
+                    return a.parent_ && b[a.parent_.id_] ? p(a.parent_, b) : a;
+                },
+                removeQuadrantChildtree: function(a, b) {
+                    var c, d = a.getChildren();
+                    for (c = 0; c < d.length; c++) {
+                        if (!b[d[c].id_]) return;
+                        delete b[d[c].id_], m.removeQuadrantChildtree(d[c], b);
+                    }
+                },
+                getIntersectingQuadrants: function q(a, b, c) {
+                    var d, e;
+                    if (!b.intersects(a[k.p], a[k.r])) return void m.removeQuadrantParentQuadrants(b, c.biggest);
+                    if (c.biggest[b.id_] = b, e = b.getChildren(), e.length) for (d = 0; d < e.length; d++) q(a, e[d], c); else c.leaves[b.id_] = b;
+                },
+                getSmallestIntersectingQuadrants: function(a, b, c) {
+                    var d, e;
+                    b || (b = i.root_), c || (c = {
+                        leaves: {},
+                        biggest: {}
+                    }), m.getIntersectingQuadrants(a, b, c);
+                    for (d in c.leaves) c.biggest[d] && (e = m.getSubtreeTopQuadrant(c.leaves[d], c.biggest), m.removeQuadrantChildtree(e, c.biggest));
+                    return c.biggest;
                 },
                 removeQuadrantObjects: function(a) {
                     var b;
@@ -248,7 +270,7 @@
                     }
                 },
                 updateObjectQuadrants: function(a) {
-                    var b, c = i.quadrants_[a[k.id]], d = m.getSmallestQuadrants(a), f = Object.keys(c), g = Object.keys(d), h = e.arrayDiffs(f, g), j = h[0], l = h[1];
+                    var b, c = i.quadrants_[a[k.id]], d = m.getSmallestIntersectingQuadrants(a), f = Object.keys(c), g = Object.keys(d), h = e.arrayDiffs(f, g), j = h[0], l = h[1];
                     for (b = 0; b < l.length; b++) m.populateSubtree(a, d[l[b]]);
                     for (b = 0; b < j.length; b++) c[j[b]] && m.removeObjectFromQuadrant(a, c[j[b]]);
                 },
@@ -259,18 +281,18 @@
                 populateSubtree: function(a, b) {
                     var c, d, e;
                     if (b || (b = i.root_), b.hasChildren()) {
-                        d = m.getSmallestQuadrants(a, b);
+                        d = m.getSmallestIntersectingQuadrants(a, b);
                         for (c in d) {
                             if (d[c] === b) return void m.addObjectToQuadrant(a, b);
                             m.populateSubtree(a, d[c]);
                         }
                     } else if (b.getObjectCount() < i.limit_) m.addObjectToQuadrant(a, b); else {
-                        b.makeChildren(m.nextQuadrantId(4)), e = m.removeQuadrantObjects(b), e[a[k.id]] = a;
+                        b.makeChildren(m.nextQuadrantId()), e = m.removeQuadrantObjects(b), e[a[k.id]] = a;
                         for (c in e) m.populateSubtree(e[c], b);
                     }
                 },
                 init: function() {
-                    j.byCallbackObject(i, l.data.necessary), i.root_ = new g(new d(0, 0), i.size_.clone(), m.nextQuadrantId()), 
+                    j.byCallbackObject(i, l.data.necessary), i.root_ = new g(new d(0, 0), i.size_.clone(), m.nextQuadrantId(1)), 
                     i.inited_ = !0;
                 },
                 checkInit: function(a) {
@@ -505,10 +527,10 @@
                 "object" != typeof a && c.thrower("NaO", "Not an Object", b);
             },
             hasKey: function(a, b, d) {
-                -1 === Object.keys(a).indexOf(b.toString()) && c.thrower("OhnK", "Object has no key", d + b);
+                this.isDefined(a, "obj"), -1 === Object.keys(a).indexOf(b.toString()) && c.thrower("OhnK", "Object has no key", d + b);
             },
             hasNoKey: function(a, b, d) {
-                -1 !== Object.keys(a).indexOf(b.toString()) && c.thrower("OhK", "Object has key", d + b);
+                this.isDefined(a, "obj"), -1 !== Object.keys(a).indexOf(b.toString()) && c.thrower("OhK", "Object has key", d + b);
             },
             fnFalse: function(a) {
                 a() && c.thrower("FarT", "function already returns true", c.fnName(a));

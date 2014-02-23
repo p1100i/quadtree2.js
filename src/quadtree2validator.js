@@ -38,12 +38,14 @@ Quadtree2Validator.prototype = {
   },
 
   hasKey : function hasKey(obj, k, key) {
+    this.isDefined(obj, 'obj');
     if ( Object.keys(obj).indexOf(k.toString()) === -1 ) {
       Quadtree2Helper.thrower('OhnK', 'Object has no key', key + k);
     }
   },
 
   hasNoKey : function hasNoKey(obj, k, key) {
+    this.isDefined(obj, 'obj');
     if ( Object.keys(obj).indexOf(k.toString()) !== -1 ) {
       Quadtree2Helper.thrower('OhK', 'Object has key', key + k);
     }
