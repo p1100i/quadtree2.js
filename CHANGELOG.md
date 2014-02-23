@@ -1,3 +1,7 @@
+- 0.4.0
+    - adds #getObjects to list added objects
+    - minor tweek with default quadrant levels
+
 - 0.3.0
     - quadrant level limit option for constructor
     - objects registered only on leaves

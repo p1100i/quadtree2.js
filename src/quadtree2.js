@@ -237,7 +237,7 @@ Quadtree2 = function Quadtree2(size, quadrantObjectsLimit, quadrantLevelLimit) {
         init : function init() {
           var divider;
 
-          if (!data.quadrantLevelLimit_) data.quadrantLevelLimit_ = 10;
+          if (!data.quadrantLevelLimit_) data.quadrantLevelLimit_ = 6;
 
           validator.byCallbackObject(data, constraints.data.necessary);
 
@@ -434,6 +434,18 @@ Quadtree2 = function Quadtree2(size, quadrantObjectsLimit, quadrantLevelLimit) {
 
         getCount : function getCount() {
           return Object.keys(data.objects_).length;
+        },
+
+        // Copies and returns data.objects_;
+        getObjects : function getObjects() {
+          var id,
+              result = {};
+
+          for (id in data.objects_) {
+            result[id] = data.objects_[id];
+          }
+
+          return result;
         },
 
         getQuadrantCount : function getQuadrantCount() {

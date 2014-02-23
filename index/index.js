@@ -194,9 +194,12 @@ window.onload = function () {
     app.$autoAdd_.innerHTML      = app.autoAdd_;
     app.$mouseAction_.innerHTML  = app.mouseActionTranslation();
     app.$logInfo_.innerHTML      = app.logLength_;
-    app.$log.innerHTML           = app.log_;
     app.$closestObjId_.innerHTML = app.closestObj_ && app.closestObj_.id_ || 'n/a';
     app.$closestObjQuadrantIds_.innerHTML = app.closestObj_ && JSON.stringify(Object.keys(app.qt.data_.quadrants_[app.closestObj_.id_])) || 'n/a';
+
+    if (app.logShown_) {
+      app.$log.innerHTML = app.log_;
+    }
   };
 
   app.redraw = function redraw() {
@@ -291,6 +294,7 @@ window.onload = function () {
       app.$log.className = '';
     } else {
       app.$log.className = 'hidden';
+      app.$log.innerHTML = '';
     }
 
     app.change('logShown');
