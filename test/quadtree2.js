@@ -356,7 +356,7 @@ describe('Quadtree2', function(){
 
         qt.addObjects([o1, o2, o3, o4, o5, o6, o7]);
 
-        qt.getPossibleCollisionsForObject(o1).should.eql({ 7 : o7 });
+        qt.getPossibleCollisionsForObject(o1).should.eql({ 3 : o3, 7 : o7 });
       });
     });
 

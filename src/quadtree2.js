@@ -123,7 +123,7 @@ Quadtree2 = function Quadtree2(size, limit, idKey) {
 
           fns.getIntersectingQuadrants(obj, quadrant, result);
 
-          for (id in result.leaves) { 
+          for (id in result.leaves) {
             if (!result.biggest[id]) { continue; }
             top = fns.getSubtreeTopQuadrant(result.leaves[id], result.biggest);
             fns.removeQuadrantChildtree(top, result.biggest);

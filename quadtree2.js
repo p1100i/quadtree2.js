@@ -1,6 +1,6 @@
 /**
  * @license
- * quadtree2 - v0.1.2
+ * quadtree2 - v0.2.1
  * Copyright (c) 2013-2014 burninggramma
  * https://github.com/burninggramma/quadtree2.js
  *
@@ -475,7 +475,7 @@
             },
             intersects: function(a, b) {
                 var c = a.subtract(this.center_, !0).abs();
-                return c.x > this.rad_.x + b ? !1 : c.y > this.rad_.y + b ? !1 : c.x <= this.rad_.x ? !0 : c.y <= this.rad_.y ? !0 : (cornerDistSq = Math.pow(c.x, 2) + Math.pow(c.y, 2), 
+                return c.x > this.rad_.x + b ? !1 : c.y > this.rad_.y + b ? !1 : c.x <= this.rad_.x ? !0 : c.y <= this.rad_.y ? !0 : (cornerDistSq = Math.pow(c.x - this.rad_.x, 2) + Math.pow(c.y - this.rad_.y, 2), 
                 cornerDistSq <= Math.pow(b, 2));
             },
             hasChildren: function() {

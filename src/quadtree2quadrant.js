@@ -102,7 +102,7 @@ Quadtree2Quadrant.prototype = {
     if (dist.x <= this.rad_.x) { return true; }
     if (dist.y <= this.rad_.y) { return true; }
 
-    cornerDistSq = Math.pow(dist.x, 2) + Math.pow(dist.y, 2);
+    cornerDistSq = Math.pow(dist.x - this.rad_.x, 2) + Math.pow(dist.y - this.rad_.y, 2);
     return cornerDistSq <= Math.pow(rad, 2);
   },
 

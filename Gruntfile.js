@@ -23,7 +23,7 @@ module.exports = function(grunt) {
         quotmark: 'single'
       },
       dev: ['Gruntfile.js', 'test/*.js'],
-      app:  ['src/*.js', 'index/index.js']
+      app:  ['src/*.js', 'index/index.js', 'test/*.js']
     },
 
     browserify: {

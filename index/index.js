@@ -22,14 +22,14 @@ window.onload = function () {
     logShown_                   : false,
     change_                     : false,
     rerender_                   : false,
-    autoAdd_                    : true,
+    autoAdd_                    : false,
     $app                        : document.getElementById('app'),
     $autoAdd                    : document.getElementById('app-autoAdd'),
     $autoAdd_                   : document.getElementById('app-autoAdd_'),
     $mouseAction                : document.getElementById('app-mouseAction'),
     $mouseAction_               : document.getElementById('app-mouseAction_'),
-    $closestId                  : document.getElementById('app-closestId'),
-    $closestId_                 : document.getElementById('app-closestId_'),
+    $closestObjId_              : document.getElementById('app-closestObjId_'),
+    $closestObjQuadrantIds_     : document.getElementById('app-closestObjQuadrantIds_'),
     $logInfo                    : document.getElementById('app-logInfo'),
     $logInfo_                   : document.getElementById('app-logInfo_'),
     $log                        : document.getElementById('app-log'),
@@ -79,8 +79,13 @@ window.onload = function () {
     return closestObj;
   };
 
+  app.vectorFromMouseEvent = function vectorFromMouseEvent(e) {
+    var off = $(app.$graphics_).parent().offset(); 
+    return new Vec2(e.pageX - off.left, e.pageY - off.top);
+  };
+
   app.handleMouseClick = function handleMouseClick(e) {
-    var point = new Vec2(e.offsetX, e.offsetY);
+    var point = app.vectorFromMouseEvent(e);
 
     switch (app.mouseAction_) {
 
@@ -135,7 +140,7 @@ window.onload = function () {
   };
 
   app.handleMouseMove = function handleMouseMove(e) {
-    app.updateClosestObject(new Vec2(e.offsetX, e.offsetY));
+    app.updateClosestObject(app.vectorFromMouseEvent(e));
   };
 
   app.updateClosestObject = function updateClosestObject(point) {
@@ -182,15 +187,16 @@ window.onload = function () {
 
   app.info = function info() {
     app.quadCount_ = app.qt.getQuadrantCount();
-    app.objCount_  = app.qt.getQuadrantObjectCount();
+    app.objCount_  = app.qt.getCount();
 
-    app.$objCount_.innerHTML    = app.objCount_;
-    app.$quadCount_.innerHTML   = app.quadCount_;
-    app.$autoAdd_.innerHTML     = app.autoAdd_;
-    app.$mouseAction_.innerHTML = app.mouseActionTranslation();
-    app.$logInfo_.innerHTML     = app.logLength_;
-    app.$log.innerHTML          = app.log_;
-    app.$closestId_.innerHTML   = app.closestObj_ && app.closestObj_.id_ || 'n/a';
+    app.$objCount_.innerHTML     = app.objCount_;
+    app.$quadCount_.innerHTML    = app.quadCount_;
+    app.$autoAdd_.innerHTML      = app.autoAdd_;
+    app.$mouseAction_.innerHTML  = app.mouseActionTranslation();
+    app.$logInfo_.innerHTML      = app.logLength_;
+    app.$log.innerHTML           = app.log_;
+    app.$closestObjId_.innerHTML = app.closestObj_ && app.closestObj_.id_ || 'n/a';
+    app.$closestObjQuadrantIds_.innerHTML = app.closestObj_ && JSON.stringify(Object.keys(app.qt.data_.quadrants_[app.closestObj_.id_])) || 'n/a';
   };
 
   app.redraw = function redraw() {
