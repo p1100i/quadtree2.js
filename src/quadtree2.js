@@ -492,7 +492,8 @@ Quadtree2 = function Quadtree2(size, quadrantObjectsLimit, quadrantLevelLimit) {
           return result;
         },
 
-        getQuadrantCount : function getQuadrantCount() {
+        getQuadrantCount : function getQuadrantCount(obj) {
+          if (obj) { return Object.keys(data.quadrants_[obj[k.id]]).length; }
           return 1 + data.root_.getChildCount(true);
         },
 
