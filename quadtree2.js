@@ -1,10 +1,10 @@
 /**
  * @license
- * quadtree2 - v0.4.2
+ * quadtree2 - v0.4.3
  * Copyright (c) 2013-2014 burninggramma
  * https://github.com/burninggramma/quadtree2.js
  *
- * Compiled: 2014-02-23
+ * Compiled: 2014-03-19
  *
  * quadtree2 is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license.php
@@ -431,7 +431,7 @@
                 throw c && (d += "_" + c), b && (d += " - "), b && c && (d += c + ": "), b && (d += b), new Error(d);
             },
             compare: function(a, b) {
-                return a > b;
+                return a - b;
             },
             arrayDiffs: function(a, b) {
                 var c = 0, d = 0, e = [], f = [];

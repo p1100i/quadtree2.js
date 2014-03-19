@@ -1,3 +1,6 @@
+- 0.4.3
+    - fixes incorrect use of sorting function
+
 - 0.4.2
     - extended API for querying quadrant count of obj
 
