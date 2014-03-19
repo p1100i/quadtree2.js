@@ -19,7 +19,7 @@ var Quadtree2Helper = {
   },
 
   compare : function compare(a,b) {
-    return a > b;
+    return a - b;
   },
 
   arrayDiffs : function arrayDiffs(arrA, arrB) {
