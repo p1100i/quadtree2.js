@@ -1,3 +1,6 @@
+- 0.4.4
+    - temporary fix for breaking travis build
+
 - 0.4.3
     - fixes incorrect use of sorting function
 

@@ -2,7 +2,7 @@
   "name"        : "quadtree2",
   "description" : "JavaScript implementation of quadtree datastructure for collision detection.",
   "author"      : "Burning Gramma <burninggramma@gmail.com>",
-  "version"     : "0.4.3",
+  "version"     : "0.4.4",
   "main"        : "src/quadtree2.js",
   "license"     : "MIT",
   "licenseUrl"  : "http://www.opensource.org/licenses/mit-license.php",
@@ -12,7 +12,7 @@
     "url"  : "https://github.com/burninggramma/quadtree2.js"
   },
   "engines"     : {
-    "node": ">= 0.6.0"
+    "node": ">= 0.10.0"
   },
   "scripts"     : {
     "test"       : "mocha test/*.js",
