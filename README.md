@@ -1,40 +1,35 @@
 # Quadtree2.js
-is a Node.js [npm-package][npm] / JavaScript implementation of two dimensional quadtree for collision detection. I've exported it for client side (browser) use with the help of [browserify][browserify].
+is a Node.js [npm-package][npm] / JavaScript implementation of two dimensional quadtree for collision detection. Exported for client side use with the help of [browserify][browserify].
 
 [![Build Status][travis-img-src]][travis-a-href]
 
 ## Try it!
 Visit the projects [GitHub IO Page][github-io] and play around.
 
-If you notice wrong behavior please click on the "Log" button, copy the stuff and post it in the [issues][github-issues] and describe the problem \(or see the [contribute](#contribute) section\).
+If you notice incorrect behavior please click on the "Log" button, copy the stuff and post it in the [issues][github-issues] and describe the problem \(or see the [contribute](#contribute) section\).
 
 ## About
 A quadtree is a scaling data structure for collision detection. You can find theory on the [WIKI][wiki].
 
-A simple example usecase would be a little two dimensional game, with some moving objects like bullet and players. You wan'na know when a collision occours. Well you could easly just compare each objects position with each other, but if there is a lot of them, that is not the right thing.
+A simple example usecase would be a two dimensional game, with some moving objects like bullets and players. You want to know when a collision occours. Could easly just compare all the objects position with each other, but if there are a lot of them, that is not the right thing to do.
 
-Upon adding objects to the quadtree you either specify the unique number identifier attribute of the objects, e.g.: id, or the quadtree itself will assing that property to them.
+Upon adding objects to the quadtree you either specify the unique number identifier attribute of the objects, like `id`, or the quadtree will do this automatically.
 
 ## Install
 - browser
   - include the [quadtree2.min.js][minified]
-- node.js
+- Node.js
   - `var Vec2 = require('vec2');`
   - `var Quadtree2 = require('quadtree2');`
 
 ## Contribute
 If you want to submit a bugfix, push a test for it as well \(should fail without the fix\).
 
-- test with mocha \(after `npm install`\)
-  - `grunt test` or `grunt watch` if you want to run the tests on every change in source files
+- test with mocha \(after `npm install`\) `grunt test` or `grunt watch` if you want to run the tests on every change in source files
+- test with browser by opening the index.html
+- build it with `grunt`
 
-- test with browser
-  - open the index.html
-
-- build
-  - `grunt`
-
-If you've played around on the [GitHub IO Page][github-io] and noticed some wrong behavior click on the "Log" button, copy the code and create a test case in the [test/demos.js][test-demo] file. I'm glad for just a test without any fix as well.
+If you've played around on the [GitHub IO Page][github-io] and noticed some incorrect behavior click on the "Log" button, copy the code and create a test case in the [test/demos.js][test-demo] file. I'm glad for just a test without any fix as well.
 
 Please follow the [git flow][gitflow] branching model.
 
