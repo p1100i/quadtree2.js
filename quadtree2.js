@@ -1,6 +1,6 @@
 /**
  * @license
- * quadtree2 - v0.5.1
+ * quadtree2 - v0.5.2
  * Copyright (c) 2013-2014 burninggramma
  * https://github.com/burninggramma/quadtree2.js
  *
@@ -263,7 +263,7 @@
                     var b, c, d, e, f;
                     if (!a.refactoring_) {
                         for (b = 0; b < a.children_.length; b++) if (e = a.children_[b], e.hasChildren()) return;
-                        if (d = a.getObjectCount(!0, !0), !(d > i.quadrantObjectsLimit_)) {
+                        if (d = a.getObjectCountForLimit(), !(d > i.quadrantObjectsLimit_)) {
                             for (a.refactoring_ = !0, b = 0; b < a.children_.length; b++) {
                                 e = a.children_[b];
                                 for (c in e.objects_) f = e.objects_[c], m.removeObjectFromQuadrant(f, e), m.addObjectToQuadrant(f, a);
@@ -484,6 +484,12 @@
             removeObject: function(a) {
                 var b = this.objects_[a];
                 return this.objectCount_--, delete this.objects_[a], b;
+            },
+            getObjectCountForLimit: function() {
+                var a, b, c = {};
+                for (b in this.objects_) c[b] = !0;
+                for (a = 0; a < this.children_.length; a++) for (b in this.children_[a].objects_) c[b] = !0;
+                return Object.keys(c).length;
             },
             getObjectCount: function(a, b) {
                 var c = this.objectCount_;
