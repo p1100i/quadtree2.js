@@ -1,6 +1,6 @@
 /**
  * @license
- * quadtree2 - v0.5.0
+ * quadtree2 - v0.5.1
  * Copyright (c) 2013-2014 burninggramma
  * https://github.com/burninggramma/quadtree2.js
  *

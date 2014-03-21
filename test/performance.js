@@ -16,7 +16,7 @@ describe('Quadtree2', function(){
           objects     = [],
           collisions  = {},
           params      = {
-            gameSize        : new Vec2(10000, 10000),
+            gameSize        : new Vec2(100000, 100000),
             maxObjectRad    : 20,
             objectCount     : 1000,
             percentOfQuery  : 100
@@ -63,11 +63,15 @@ describe('Quadtree2', function(){
       qt = new Quadtree2(params.gameSize, 2, 8);
       qt.debug(true);
 
-      times[1] = process.hrtime();
+      // It is debetable if adding the objects to the tree
+      // should be benchmarked as well. Updating them
+      // definitley, but that will be another test.
 
       for (i = 0; i < objects.length; i++) {
         qt.addObject(objects[i]);
       }
+
+      times[1] = process.hrtime();
 
       for (i = 0; i < objects.length; i++) {
         if (objects[i].q_) {
