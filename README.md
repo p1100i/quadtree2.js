@@ -1,27 +1,44 @@
 # Quadtree2.js
-is a Node.js package / JavaScript implementation of two dimensional quadtree for collision detection.
+is a Node.js [npm-package][npm] / JavaScript implementation of two dimensional quadtree for collision detection. I've exported it for client side (browser) use with the help of [browserify][browserify].
 
 [![Build Status][travis-img-src]][travis-a-href]
 
 ## Try it!
 Visit the projects [GitHub IO Page][github-io] and play around.
 
+If you notice wrong behavior please click on the "Log" button, copy the stuff and post it in the [issues][github-issues] and describe the problem \(or see the [contribute](#contribute) section\).
+
 ## About
-A quadtree is a scaling data structure for collision detection. You can find theory on the [WIKI][wiki]. I've exported the project for client side use with the help of [browserify][browserify]. Issues/PRs are welcome, please follow [git flow][gitflow] branching model.
+A quadtree is a scaling data structure for collision detection. You can find theory on the [WIKI][wiki].
 
 A simple example usecase would be a little two dimensional game, with some moving objects like bullet and players. You wan'na know when a collision occours. Well you could easly just compare each objects position with each other, but if there is a lot of them, that is not the right thing.
 
 Upon adding objects to the quadtree you either specify the unique number identifier attribute of the objects, e.g.: id, or the quadtree itself will assing that property to them.
 
 ## Install
-- Browser
+- browser
   - include the [quadtree2.min.js][minified]
-- Node.js
+- node.js
   - `var Vec2 = require('vec2');`
   - `var Quadtree2 = require('quadtree2');`
 
-## Use
+## Contribute
+If you want to submit a bugfix, push a test for it as well \(should fail without the fix\).
 
+- test with mocha \(after `npm install`\)
+  - `grunt test` or `grunt watch` if you want to run the tests on every change in source files
+
+- test with browser
+  - open the index.html
+
+- build
+  - `grunt`
+
+If you've played around on the [GitHub IO Page][github-io] and noticed some wrong behavior click on the "Log" button, copy the code and create a test case in the [test/demos.js][test-demo] file. I'm glad for just a test without any fix as well.
+
+Please follow the [git flow][gitflow] branching model.
+
+## Use
 ```javascript
 var // Variable to save the collisions
     alicesCollisions,
@@ -89,9 +106,11 @@ bobsDeadlyCollisions = quadtree.getCollisionsForObject(bob);
   [git-LICENSE]: LICENSE
   [travis-img-src]: https://travis-ci.org/burninggramma/quadtree2.js.png?branch=master
   [travis-a-href]: https://travis-ci.org/burninggramma/quadtree2.js
-  [browser-test]: https://github.com/burninggramma/quadtree2.js/blob/master/test/browser/index.html
   [minified]: https://github.com/burninggramma/quadtree2.js/blob/master/quadtree2.min.js
   [wiki]: http://en.wikipedia.org/wiki/Quadtree
   [browserify]: http://browserify.org/
   [gitflow]: https://github.com/nvie/gitflow
   [github-io]: http://burninggramma.github.io/quadtree2.js
+  [github-issues]: https://github.com/burninggramma/quadtree2.js/issues
+  [test-demo]: test/demos.js
+  [npm]: https://www.npmjs.org/package/quadtree2
