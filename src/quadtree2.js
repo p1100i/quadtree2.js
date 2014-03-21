@@ -174,7 +174,7 @@ Quadtree2 = function Quadtree2(size, quadrantObjectsLimit, quadrantLevelLimit) {
 
           if (quadrant.refactoring_) { return; }
 
-          // Lets check for children.
+          // Lets check for grandchildren.
           for (i = 0; i < quadrant.children_.length; i++) {
             child = quadrant.children_[i];
 
@@ -183,7 +183,7 @@ Quadtree2 = function Quadtree2(size, quadrantObjectsLimit, quadrantLevelLimit) {
             }
           }
 
-          count = quadrant.getObjectCount(true, true);
+          count = quadrant.getObjectCountForLimit();
 
           if (count > data.quadrantObjectsLimit_) { return; }
 

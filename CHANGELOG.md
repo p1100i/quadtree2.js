@@ -1,3 +1,6 @@
+- 0.5.2
+    - adds test case and fix for tree refactoring
+
 - 0.5.1
     - make travis pass the performance test
 

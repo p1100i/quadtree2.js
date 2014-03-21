@@ -92,6 +92,24 @@ Quadtree2Quadrant.prototype = {
     return result;
   },
 
+  getObjectCountForLimit : function getObjectCountForLimit() {
+    var i,
+        id,
+        objects = {};
+
+    for (id in this.objects_) {
+      objects[id] = true;
+    }
+
+    for (i = 0; i < this.children_.length; i++) {
+      for (id in this.children_[i].objects_) {
+        objects[id] = true;
+      }
+    }
+
+    return Object.keys(objects).length;
+  },
+
   getObjectCount : function getObjectCount(recursive, onelevel) {
     var result = this.objectCount_;
 
