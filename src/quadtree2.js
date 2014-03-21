@@ -15,6 +15,7 @@ Quadtree2 = function Quadtree2(size, quadrantObjectsLimit, quadrantLevelLimit) {
         quadrantIds_ : 1,
         autoId_      : true,
         inited_      : false,
+        debug_       : false,
         size_        : undefined,
         root_        : undefined,
         quadrantObjectsLimit_ : undefined,
@@ -326,14 +327,17 @@ Quadtree2 = function Quadtree2(size, quadrantObjectsLimit, quadrantLevelLimit) {
         },
 
         getObjectsByObject : function getObjectsByObject(obj) {
-          var key,
-              result = {
-                quadrants : {},
-                objects   : {}
-              };
+          var i,
+              id,
+              quadrants = data.quadrants_[obj[k.id]],
+              result    = { objects : {}, quadrants : {} };
 
-          for (key in data.quadrants_[obj[k.id]]) {
-            data.quadrants_[obj[k.id]][key].getObjects(result);
+          for (id in quadrants) {
+            quadrants[id].getObjectsUp(result);
+
+            for (i = 0; i < quadrants[id].children_.length; i++) {
+              quadrants[id].children_[i].getObjectsDown(result);
+            }
           }
 
           delete result.objects[obj[k.id]];

@@ -154,27 +154,39 @@ Quadtree2Quadrant.prototype = {
     return result;
   },
 
-  getObjects : function getObjects(result, dir) {
+  getObjectsUp : function getObjectsUp(result) {
     var id;
 
-    if (result.quadrants[this.id_]) { return; }
+    if (result.quadrants[this.id_]) {
+      return;
+    }
 
-    result.quadrants[this.id_] = this.id_;
+    result.quadrants[this.id_] = true;
 
     for (id in this.objects_) {
-      if (result.objects[id]) { continue; }
-
       result.objects[id] = this.objects_[id];
     }
 
-    if (!dir || dir === 1) {
-      if (this.parent_) { this.parent_.getObjects(result, 1); }
+    if (this.parent_) {
+      this.parent_.getObjectsUp(result);
+    }
+  },
+
+  getObjectsDown : function getObjectsDown(result) {
+    var id;
+
+    if (result.quadrants[this.id_]) {
+      return;
     }
 
-    if (!dir || dir === -1) {
-      this.children_.forEach(function(child) {
-        child.getObjects(result, -1);
-      });
+    result.quadrants[this.id_] = true;
+
+    for (id in this.objects_) {
+      result.objects[id] = this.objects_[id];
+    }
+
+    for (id = 0; id < this.children_.length; id++) {
+      this.children_[id].getObjectsDown(result);
     }
   }
 };
