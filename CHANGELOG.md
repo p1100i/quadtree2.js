@@ -1,3 +1,6 @@
+- 0.5.1
+    - make travis pass the performance test
+
 - 0.5.0
     - performance optimizations
     - naive performance tests
