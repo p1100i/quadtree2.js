@@ -11,22 +11,16 @@ describe('Quadtree2', function(){
   context('with a lot of objects', function() {
     it('should be faster then the trivial solution', function() {
       var i,
-          time,
           qt,
+          times       = [],
           objects     = [],
           collisions  = {},
-          checkCount  = 0,
-          skip        = true,
           params      = {
-            gameSize        : new Vec2(100000, 100000),
+            gameSize        : new Vec2(10000, 10000),
             maxObjectRad    : 20,
             objectCount     : 1000,
             percentOfQuery  : 100
           };
-
-      if (skip) {
-        return;
-      }
 
       for (i = 0; i < params.objectCount; i++) {
         objects.push({
@@ -41,7 +35,7 @@ describe('Quadtree2', function(){
       }
 
       // Start timer
-      time = process.hrtime();
+      times[0] = process.hrtime();
 
       collisions.trivial = {};
 
@@ -52,7 +46,6 @@ describe('Quadtree2', function(){
           for (j = 0; j < objects.length; j++) {
             if (i === j) continue;
 
-            checkCount++;
             if (objects[i].rad_ + objects[j].rad_ > objects[i].pos_.distance(objects[j].pos_)) {
               collisions.trivial[objects[i].id_][objects[j].id_] = objects[j];
             }
@@ -60,11 +53,9 @@ describe('Quadtree2', function(){
         }
       }
 
-      time = process.hrtime(time);
+      times[0] = process.hrtime(times[0]);
 
-      logTime(time);
-
-      //console.log('checked: ' + checkCount + ' time(s)');
+      logTime(times[0]);
 
       collisions.qt = {};
 
@@ -72,11 +63,11 @@ describe('Quadtree2', function(){
       qt = new Quadtree2(params.gameSize, 2, 8);
       qt.debug(true);
 
+      times[1] = process.hrtime();
+
       for (i = 0; i < objects.length; i++) {
         qt.addObject(objects[i]);
       }
-
-      time = process.hrtime();
 
       for (i = 0; i < objects.length; i++) {
         if (objects[i].q_) {
@@ -84,10 +75,11 @@ describe('Quadtree2', function(){
         }
       }
 
-      time = process.hrtime(time);
+      times[1] = process.hrtime(times[1]);
 
-      logTime(time);
-      //console.log('checked: ' + qt.data_.tmp_.checkCount_ + ' time(s)');
+      logTime(times[1]);
+
+      times[1].should.lessThan(times[0]);
     });
   });
 });
