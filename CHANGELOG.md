@@ -1,3 +1,8 @@
+- 0.5.0
+    - performance optimizations
+    - naive performance tests
+    - tests for fix 0.4.3
+
 - 0.4.4
     - temporary fix for breaking travis build
 

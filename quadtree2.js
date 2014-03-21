@@ -1,10 +1,10 @@
 /**
  * @license
- * quadtree2 - v0.4.4
+ * quadtree2 - v0.5.0
  * Copyright (c) 2013-2014 burninggramma
  * https://github.com/burninggramma/quadtree2.js
  *
- * Compiled: 2014-03-19
+ * Compiled: 2014-03-21
  *
  * quadtree2 is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license.php
@@ -180,6 +180,7 @@
                 quadrantIds_: 1,
                 autoId_: !0,
                 inited_: !1,
+                debug_: !1,
                 size_: void 0,
                 root_: void 0,
                 quadrantObjectsLimit_: void 0,
@@ -315,12 +316,12 @@
                     j.hasKey(i.objects_, a, k.id), m.updateObjectQuadrants(i.objects_[a]);
                 },
                 getObjectsByObject: function(a) {
-                    var b, c = {
-                        quadrants: {},
-                        objects: {}
+                    var b, c, d = i.quadrants_[a[k.id]], e = {
+                        objects: {},
+                        quadrants: {}
                     };
-                    for (b in i.quadrants_[a[k.id]]) i.quadrants_[a[k.id]][b].getObjects(c);
-                    return delete c.objects[a[k.id]], c.objects;
+                    for (c in d) for (d[c].getObjectsUp(e), b = 0; b < d[c].children_.length; b++) d[c].children_[b].getObjectsDown(e);
+                    return delete e.objects[a[k.id]], e.objects;
                 }
             }, n = {
                 getQuadrants: function() {
@@ -514,14 +515,20 @@
                     c.getChildren(a, b);
                 }), b;
             },
-            getObjects: function(a, b) {
-                var c;
+            getObjectsUp: function(a) {
+                var b;
                 if (!a.quadrants[this.id_]) {
-                    a.quadrants[this.id_] = this.id_;
-                    for (c in this.objects_) a.objects[c] || (a.objects[c] = this.objects_[c]);
-                    b && 1 !== b || this.parent_ && this.parent_.getObjects(a, 1), b && -1 !== b || this.children_.forEach(function(b) {
-                        b.getObjects(a, -1);
-                    });
+                    a.quadrants[this.id_] = !0;
+                    for (b in this.objects_) a.objects[b] = this.objects_[b];
+                    this.parent_ && this.parent_.getObjectsUp(a);
+                }
+            },
+            getObjectsDown: function(a) {
+                var b;
+                if (!a.quadrants[this.id_]) {
+                    a.quadrants[this.id_] = !0;
+                    for (b in this.objects_) a.objects[b] = this.objects_[b];
+                    for (b = 0; b < this.children_.length; b++) this.children_[b].getObjectsDown(a);
                 }
             }
         }, b.exports = c;
