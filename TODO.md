@@ -4,6 +4,6 @@
     + improve performance
 
 - icebox
-    - performance should not be a test, however a script
-      generating some meaningful statistics where
+    - performance measurement shouldn't be tests, however a script 
+      generating some meaningful statistics, displaying which case
       the quadtree performs well
