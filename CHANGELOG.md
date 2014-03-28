@@ -1,3 +1,7 @@
+- 0.5.3
+    - fixes string based id compare issue on update
+    - more tests
+
 - 0.5.2
     - adds test case and fix for tree refactoring
 

@@ -18,6 +18,16 @@ var Quadtree2Helper = {
     throw new Error(error);
   },
 
+  getIdsOfObjects : function getIdsOfObjects(hash) {
+    var result = [];
+
+    for (var id in hash) {
+      result.push(hash[id].id_);
+    }
+
+    return result;
+  },
+
   compare : function compare(a,b) {
     return a - b;
   },
