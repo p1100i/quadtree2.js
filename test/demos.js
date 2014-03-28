@@ -221,5 +221,60 @@ describe('Quadtree2', function(){
       qt.getPossibleCollisionsForObject(o3).should.eql({ 1 : o1, 2 : o2, 4 : o4 });
     });
   });
+
+  context('with moving objects on quadrant corners', function() {
+    it('should not remove necessary quadrant', function() {
+      var qt = new Quadtree2(new Vec2(500, 500), 4);
+      var o1 = { pos_ : new Vec2(300, 463.79999542), rad_ : 16 };
+      qt.addObject(o1);
+      var o2 = { pos_ : new Vec2(314, 328.79999542), rad_ : 4 };
+      qt.addObject(o2);
+      var o3 = { pos_ : new Vec2(170, 322.79999542), rad_ : 6 };
+      qt.addObject(o3);
+      var o4 = { pos_ : new Vec2(170, 440.79999542), rad_ : 3 };
+      qt.addObject(o4);
+      var o5 = { pos_ : new Vec2(424, 461.79999542), rad_ : 4 };
+      qt.addObject(o5);
+      var o6 = { pos_ : new Vec2(439, 325.79999542), rad_ : 18 };
+      qt.addObject(o6);
+      var o7 = { pos_ : new Vec2(40, 306.79999542), rad_ : 14 };
+      qt.addObject(o7);
+      var o8 = { pos_ : new Vec2(36, 443.79999542), rad_ : 4 };
+      qt.addObject(o8);
+      var o9 = { pos_ : new Vec2(181, 41.79999542), rad_ : 17 };
+      qt.addObject(o9);
+      var o10 = { pos_ : new Vec2(59, 42.79999542), rad_ : 13 };
+      qt.addObject(o10);
+      var o11 = { pos_ : new Vec2(33, 116.79999542), rad_ : 17 };
+      qt.addObject(o11);
+      var o12 = { pos_ : new Vec2(318, 25.79999542), rad_ : 7 };
+      qt.addObject(o12);
+      var o13 = { pos_ : new Vec2(440, 30.79999542), rad_ : 2 };
+      qt.addObject(o13);
+      var o14 = { pos_ : new Vec2(477, 130.79999542), rad_ : 1 };
+      qt.addObject(o14);
+
+      o9.pos_ = new Vec2(250, 100);
+      qt.updateObject(o9);
+
+      var o15 = { pos_ : new Vec2(385, 39), rad_ : 17 };
+      qt.addObject(o15);
+
+      o9.pos_ = new Vec2(250, 270);
+      qt.updateObject(o9);
+
+      qt.getPossibleCollisionsForObject(o9).should.eql({ 2 : o2, 3 : o3 });
+
+      o9.pos_ = new Vec2(250, 265);
+      qt.updateObject(o9);
+
+      qt.getPossibleCollisionsForObject(o9).should.eql({ 2 : o2, 3 : o3, 10 : o10, 11 : o11 });
+
+      o9.pos_ = new Vec2(250, 264.79999542);
+      qt.updateObject(o9);
+
+      qt.getPossibleCollisionsForObject(o9).should.eql({ 2 : o2, 3 : o3, 10 : o10, 11 : o11 });
+    });
+  });
 });
 

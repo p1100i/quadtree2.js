@@ -211,8 +211,8 @@ Quadtree2 = function Quadtree2(size, quadrantObjectsLimit, quadrantLevelLimit) {
         updateObjectQuadrants : function updateObjectQuadrants(obj) {
           var oldQuadrants  = data.quadrants_[obj[k.id]],
               newQuadrants  = fns.getSmallestIntersectingQuadrants(obj),
-              oldIds        = Object.keys(oldQuadrants),
-              newIds        = Object.keys(newQuadrants),
+              oldIds        = Quadtree2Helper.getIdsOfObjects(oldQuadrants),
+              newIds        = Quadtree2Helper.getIdsOfObjects(newQuadrants),
               diffIds       = Quadtree2Helper.arrayDiffs(oldIds, newIds),
               removeIds     = diffIds[0],
               addIds        = diffIds[1],
