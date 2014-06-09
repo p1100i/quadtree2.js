@@ -1,3 +1,6 @@
+- 0.5.4
+    - important notes to README about grid2.js
+
 - 0.5.3
     - fixes string based id compare issue on update
     - more tests

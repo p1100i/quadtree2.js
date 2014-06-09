@@ -1,7 +1,11 @@
 # Quadtree2.js
 is a Node.js [npm-package][npm] / JavaScript implementation of two dimensional quadtree for collision detection. Exported for client side use with the help of [browserify][browserify].
+It is a work in progress, look for the first stable release if interested.
 
 [![Build Status][travis-img-src]][travis-a-href]
+
+## Important notes
+After experimenting around with performance tests, the current implementation does not justify the use in **game projects**. I've started the [grid2.js][github-grid2] project for collision detection and ray casting calculations in two dimensional space. It is not scaling structure, but performs lot better at the moment in browser games. Give it a try, if that is your use case.
 
 ## Try it!
 Visit the projects [GitHub IO Page][github-io] and play around.
@@ -107,5 +111,6 @@ bobsDeadlyCollisions = quadtree.getCollisionsForObject(bob);
   [gitflow]: https://github.com/nvie/gitflow
   [github-io]: http://burninggramma.github.io/quadtree2.js
   [github-issues]: https://github.com/burninggramma/quadtree2.js/issues
+  [github-grid2]: https://github.com/burninggramma/grid2.js
   [test-demo]: test/demos.js
   [npm]: https://www.npmjs.org/package/quadtree2
