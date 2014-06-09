@@ -18,7 +18,8 @@
         position    : absolute;
         margin-left : -500px;
         margin-top  : -400px;
-        background-image: url('index/back.png');
+        border      : 1px solid black;
+        background-color: #5A6856;
         -moz-box-shadow:    inset 0 0 10px #fff;
         -webkit-box-shadow: inset 0 0 10px #fff;
         box-shadow:         inset 0 0 10px #fff;
@@ -44,6 +45,7 @@
       }
       
       ul {
+        margin  : 0;
         display : inline-block;
         width   : 390px;
       }
@@ -69,6 +71,13 @@
         background-color: #51b12f;
       }
 
+      li.info {
+        background-color  : white;
+        color             : #888;
+        height            : 55px;
+        margin-bottom     : 25px;
+      }
+
       li.action:hover {
         background-color: #f1b12f;
         border-color: white;
@@ -79,13 +88,14 @@
 
       li span {
         display       : inline-block;
-        overflow      : hidden;
-        text-overflow : ellipsis;
-        white-space: nowrap;
       }
 
       li span:first-child {
         width: 210px;
+      }
+
+      li span.small {
+        font-size: 12px;
       }
 
       li span[id] {
@@ -93,10 +103,17 @@
         float         : right;
         width         : 150px;
         text-align    : right;
+        overflow      : hidden;
+        text-overflow : ellipsis;
+        white-space   : nowrap;
       }
 
       li.action span[id] {
         color : white;
+      }
+
+      li.info span:first-child {
+        width: 100%;
       }
 
       div#app-graphics_ {
@@ -114,6 +131,12 @@
       <div id='app'>
         <div id='app-graphics_'></div>
         <ul>
+          <li class="info">
+            Welcome to the Quadtree2.js demo page!
+            <span class="small">
+              Experiment around by using the green action buttons and by clicking on the square to trigger the current action.
+            </span>
+          </li>
           <li>
             <span>Selected id:</span>
             <span id='app-closestObjId_'></span>
