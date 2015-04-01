@@ -3,7 +3,7 @@ module.exports = function(grunt) {
     '/**',
     ' * @license',
     ' * <%= pkg.name %> - v<%= pkg.version %>',
-    ' * Copyright (c) 2013-2014 burninggramma',
+    ' * Copyright (c) 2013-2014 p1100i',
     ' * <%= pkg.repository.url %>',
     ' *',
     ' * Compiled: <%= grunt.template.today("yyyy-mm-dd") %>',
