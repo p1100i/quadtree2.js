@@ -103,14 +103,14 @@ bobsDeadlyCollisions = quadtree.getCollisionsForObject(bob);
 [MIT License][git-LICENSE]
 
   [git-LICENSE]: LICENSE
-  [travis-img-src]: https://travis-ci.org/burninggramma/quadtree2.js.png?branch=master
-  [travis-a-href]: https://travis-ci.org/burninggramma/quadtree2.js
-  [minified]: https://github.com/burninggramma/quadtree2.js/blob/master/quadtree2.min.js
+  [travis-img-src]: https://travis-ci.org/p1100i/quadtree2.js.png?branch=master
+  [travis-a-href]: https://travis-ci.org/p1100i/quadtree2.js
+  [minified]: https://github.com/p1100i/quadtree2.js/blob/master/quadtree2.min.js
   [wiki]: http://en.wikipedia.org/wiki/Quadtree
   [browserify]: http://browserify.org/
   [gitflow]: https://github.com/nvie/gitflow
-  [github-io]: http://burninggramma.github.io/quadtree2.js
-  [github-issues]: https://github.com/burninggramma/quadtree2.js/issues
-  [github-grid2]: https://github.com/burninggramma/grid2.js
+  [github-io]: http://p1100i.github.io/quadtree2.js
+  [github-issues]: https://github.com/p1100i/quadtree2.js/issues
+  [github-grid2]: https://github.com/p1100i/grid2.js
   [test-demo]: test/demos.js
   [npm]: https://www.npmjs.org/package/quadtree2

@@ -1,10 +1,10 @@
 /**
  * @license
  * quadtree2 - v0.5.4
- * Copyright (c) 2013-2014 burninggramma
- * https://github.com/burninggramma/quadtree2.js
+ * Copyright (c) 2013-2014 p1100i
+ * https://github.com/p1100i/quadtree2.js
  *
- * Compiled: 2014-06-09
+ * Compiled: 2015-04-01
  *
  * quadtree2 is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license.php
