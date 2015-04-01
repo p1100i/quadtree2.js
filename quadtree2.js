@@ -1,6 +1,6 @@
 /**
  * @license
- * quadtree2 - v0.5.4
+ * quadtree2 - v0.5.5
  * Copyright (c) 2013-2014 p1100i
  * https://github.com/p1100i/quadtree2.js
  *
