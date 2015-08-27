@@ -1,4 +1,5 @@
 - 0.6.0
+    - remove Quadtree2Helper
     - instead of arrayDiff, use same concept as Grid2.js for new/old quadrants
     - more options for JSHint
     - integrate my-helper npm package

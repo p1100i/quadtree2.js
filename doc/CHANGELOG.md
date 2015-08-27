@@ -1,3 +1,7 @@
+- 0.6.0
+    - lots of reshaping and breaking changes
+    - getCollisionsForObject renamed to getCollidables
+
 - 0.5.4
     - important notes to README about grid2.js
 
