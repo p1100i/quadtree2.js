@@ -34,10 +34,10 @@ Quadtree2Quadrant.prototype = {
     if (this.children_.length > 0) { return false; }
 
     this.children_.push(
-      new Quadtree2Quadrant(this.leftTop_,  this.rad_, id++, this),
-      new Quadtree2Quadrant(this.topMid_,   this.rad_, id++, this),
-      new Quadtree2Quadrant(this.leftMid_,  this.rad_, id++, this),
-      new Quadtree2Quadrant(this.center_,   this.rad_, id++, this)
+      new Quadtree2Quadrant(this.leftTop_,  this.rad_, ++id, this),
+      new Quadtree2Quadrant(this.topMid_,   this.rad_, ++id, this),
+      new Quadtree2Quadrant(this.leftMid_,  this.rad_, ++id, this),
+      new Quadtree2Quadrant(this.center_,   this.rad_, ++id, this)
     );
 
     return id;
@@ -55,9 +55,9 @@ Quadtree2Quadrant.prototype = {
     }
   },
 
-  addObject : function addObject(id, obj) {
+  addObject : function addObject(id, object) {
     this.objectCount_++;
-    this.objects_[id] = obj;
+    this.objects_[id] = object;
   },
 
   removeObjects : function removeObjects(removed, dir) {
@@ -66,7 +66,7 @@ Quadtree2Quadrant.prototype = {
     if (!removed) { removed = []; }
 
     for (id in this.objects_) {
-      removed.push({ obj : this.objects_[id], quadrant : this });
+      removed.push({ object : this.objects_[id], quadrant : this });
       delete this.objects_[id];
     }
 
@@ -87,8 +87,11 @@ Quadtree2Quadrant.prototype = {
 
   removeObject : function removeObject(id) {
     var result = this.objects_[id];
+
     this.objectCount_--;
-    delete(this.objects_[id]);
+
+    delete this.objects_[id];
+
     return result;
   },
 
@@ -206,6 +209,8 @@ Quadtree2Quadrant.prototype = {
     for (id = 0; id < this.children_.length; id++) {
       this.children_[id].getObjectsDown(result);
     }
+
+    return result;
   }
 };
 

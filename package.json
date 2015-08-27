@@ -15,7 +15,7 @@
     "node": ">= 0.10.0"
   },
   "scripts"     : {
-    "test"       : "mocha test/**/*.js",
+    "test"       : "mocha test/spec/**/*.spec.js",
     "test-watch" : "grunt watch",
     "build"      : "grunt"
   },
@@ -23,7 +23,7 @@
     "vec2"    : "1.4.0"
   },
   "devDependencies": {
-    "mocha"               : "latest",
+    "blanket"             : "latest",
     "should"              : "latest",
     "grunt"               : "latest",
     "grunt-cli"           : "latest",
@@ -31,7 +31,7 @@
     "grunt-contrib-jshint": "latest",
     "grunt-contrib-watch" : "latest",
     "grunt-contrib-uglify": "latest",
-    "grunt-simple-mocha"  : "latest"
+    "grunt-mocha-test"    : "latest"
   },
   "keywords": [
     "quadtree",

@@ -1,13 +1,13 @@
-var Quadtree2   = require('../src/quadtree2'),
+var Quadtree2   = require('../../src/quadtree2'),
     Vec2        = require('vec2'),
     assert      = require('assert'),
     should      = require('should'),
-    logTime     = function(time) {
+    logTime     = function logTime(time) {
       //console.log(time[0] + ' s, ' + ((time[1] / 1e6).toFixed(4)) + ' ms');
     };
 
 
-describe('Quadtree2', function(){
+xdescribe('Quadtree2', function(){
   context('with a lot of objects', function() {
     it('should be faster then the trivial solution', function() {
       var i,
