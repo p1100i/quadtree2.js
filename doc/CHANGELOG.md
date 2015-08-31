@@ -1,6 +1,8 @@
 - 0.6.0
-    - lots of reshaping and breaking changes
-    - getCollisionsForObject renamed to getCollidables
+    - lots of reshaping and breaking changes on the API
+    - getCollisionsForObject renamed to getCollidings
+    - getPossibleCollisionsForObject renamed to getCollidables
+    - test architecture rebuilt w/ added blanket coverage
 
 - 0.5.4
     - important notes to README about grid2.js
