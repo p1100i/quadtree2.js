@@ -55,19 +55,33 @@ module.exports = function(grunt) {
       },
     },
 
-    simplemocha : {
-      all: { src : ['test/*.js'] },
-      options : {
-        reporter: 'spec',
-        slow: 200,
-        timeout: 100
+    mochaTest: {
+      test: {
+        src : ['test/spec/**/*.spec.js'],
+
+        options : {
+          reporter  : 'spec',
+          slow      : 200,
+          require   : 'test/blanket',
+          timeout   : 100
+        }
+      },
+
+      coverage: {
+        src : ['test/spec/**/*.spec.js'],
+
+        options : {
+          reporter    : 'html-cov',
+          quiet       : true,
+          captureFile : 'test/report/coverage.html'
+        }
       }
     },
 
     watch : {
       scripts : {
-        files : ['test/*.js', 'src/*.js', 'index/index.js'],
-        tasks : ['test']
+        files : ['test/**/*.js', 'src/*.js', 'index/index.js'],
+        tasks : ['test', 'build']
       }
     }
   });
@@ -76,11 +90,11 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-uglify');
-  grunt.loadNpmTasks('grunt-simple-mocha');
+  grunt.loadNpmTasks('grunt-mocha-test');
 
   grunt.registerTask('test', [
     'jshint',
-    'simplemocha'
+    'mochaTest'
   ]);
   grunt.registerTask('build', [
     'browserify',
@@ -90,7 +104,7 @@ module.exports = function(grunt) {
 
   grunt.registerTask('default', [
     'jshint',
-    'simplemocha',
+    'mochaTest',
     'browserify',
     'uglify:browserified',
     'uglify:build'

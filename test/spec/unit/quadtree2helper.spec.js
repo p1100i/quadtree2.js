@@ -1,4 +1,4 @@
-var Quadtree2Helper     = require('../src/quadtree2helper'),
+var Quadtree2Helper     = require('../../../src/quadtree2helper'),
     assert              = require('assert'),
     should              = require('should'),
     shortArr            = [3, 1, 2],
@@ -11,7 +11,7 @@ var Quadtree2Helper     = require('../src/quadtree2helper'),
     longSortedArrBigs   = [1, 2, 2, 12, 15, 24, 24, 31, 62, 355, 555];
 
 describe('Quadtree2Helper', function(){
-  describe('.arrayDiffs', function(){
+  describe('.arrayDiffs()', function(){
     context('with two empty arrays', function() {
       it('should return an array of two empty array', function() {
         Quadtree2Helper.arrayDiffs([], []).should.eql([[], []]);
