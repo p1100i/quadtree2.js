@@ -1,10 +1,10 @@
 /**
  * @license
- * quadtree2 - v0.6.0
+ * quadtree2 - v0.7.0
  * Copyright (c) 2013-2014 p1100i
  * https://github.com/p1100i/quadtree2.js
  *
- * Compiled: 2015-08-31
+ * Compiled: 2015-09-08
  *
  * quadtree2 is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license.php

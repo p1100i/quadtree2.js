@@ -2,7 +2,7 @@
   "name"        : "quadtree2",
   "description" : "JavaScript implementation of quadtree datastructure for collision detection.",
   "author"      : "peters <p1100i.dev@gmail.com>",
-  "version"     : "0.6.0",
+  "version"     : "0.7.0",
   "main"        : "src/quadtree2.js",
   "license"     : "MIT",
   "licenseUrl"  : "http://www.opensource.org/licenses/mit-license.php",
